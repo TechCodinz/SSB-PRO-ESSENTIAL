@@ -1,0 +1,45 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>Admin Payments</title>
+    <style>
+      body { font-family: Arial, sans-serif; background:#111; color:#fff; padding:20px }
+      table { width:100%; border-collapse: collapse }
+      td, th { padding:8px; border:1px solid #333 }
+      .verified { color:#0f0 }
+    </style>
+  </head>
+  <body>
+    <h2>Payments</h2>
+    <table>
+      <thead>
+  <tr><th>Asset</th><th>Amount</th><th>TXID</th><th>Contact</th><th>Verified</th><th>License Key</th><th>Actions</th></tr>
+      </thead>
+      <tbody>
+        {% for p in payments %}
+          <tr>
+            <td>{{ p.asset }}</td>
+            <td>{{ p.amount }}</td>
+            <td>{{ p.txid }}</td>
+            <td>{{ p.contact }}</td>
+            <td>{% if p.verified %}<span class="verified">Yes</span>{% else %}No{% endif %}</td>
+            <td>{{ p.license_key or '' }}</td>
+            <td>
+              {% if not p.verified %}
+                <form method="post" style="display:inline">
+                  <input type="hidden" name="txid" value="{{ p.txid }}">
+                  <button type="submit">Mark Verified</button>
+                </form>
+                <form method="post" action="/admin/verify-online" style="display:inline; margin-left:6px">
+                  <input type="hidden" name="txid" value="{{ p.txid }}">
+                  <button type="submit">Verify Online</button>
+                </form>
+              {% endif %}
+            </td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </body>
+</html>

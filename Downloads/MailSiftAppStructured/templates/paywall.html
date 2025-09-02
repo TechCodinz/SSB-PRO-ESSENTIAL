@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Unlock MailSift Access</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
+    <style>
+        body {
+            background: #0e0e0e;
+            font-family: 'Inter', sans-serif;
+            color: #fff;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+
+        .paywall {
+            background: #1c1c1c;
+            padding: 40px;
+            border-radius: 12px;
+            box-shadow: 0 0 20px #00ffc3;
+            max-width: 400px;
+            text-align: center;
+        }
+
+        input, button {
+            padding: 10px 15px;
+            font-size: 1rem;
+            margin: 10px 0;
+            border-radius: 6px;
+            border: none;
+            outline: none;
+        }
+
+        input {
+            width: 100%;
+        }
+
+        button {
+            background-color: #00ffc3;
+            color: #000;
+            font-weight: 600;
+            cursor: pointer;
+            width: 100%;
+        }
+
+        .wallets {
+            margin-top: 20px;
+            background: #111;
+            padding: 10px;
+            border-radius: 8px;
+            text-align: left;
+            font-size: 0.9rem;
+        }
+
+        .error {
+            color: #ff4444;
+            font-size: 0.9rem;
+            margin-top: 10px;
+        }
+
+        h2 {
+            color: #00ffc3;
+            margin-bottom: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="paywall">
+        <h2>Unlock MailSift</h2>
+        <p>Enter your license key or pay to get one instantly:</p>
+        <form method="post" action="/unlock">
+            <input type="text" name="license_key" placeholder="Enter License Key" required>
+            <button type="submit">Unlock</button>
+        </form>
+
+        {% if error %}
+            <div class="error">{{ error }}</div>
+        {% endif %}
+
+        <div class="wallets">
+            <p><strong>Crypto Wallets for Payment:</strong></p>
+            <ul>
+                <li>BTC: <code>bc1qyourbtcwallet</code></li>
+                <li>USDT (TRC20): <code>TXyourusdtaddress</code></li>
+                <li>ETH: <code>0xyourethwallet</code></li>
+            </ul>
+            <p>After payment, contact us or use the key provided to unlock.</p>
+        </div>
+        <hr>
+        <h3>Submit Payment TXID</h3>
+        <form method="post" action="/pay">
+            <label>Asset</label>
+            <input type="text" name="asset" value="USDT (TRC20)" required>
+            <label>Amount</label>
+            <input type="text" name="amount" placeholder="Amount" required>
+            <label>TXID</label>
+            <input type="text" name="txid" placeholder="Transaction ID" required>
+            <label>Contact Email (optional)</label>
+            <input type="email" name="contact" placeholder="you@domain.com">
+            <button type="submit">Submit Payment</button>
+        </form>
+        <hr>
+        <h3>Redeem Verified TXID</h3>
+        <form method="post" action="/redeem">
+            <label>TXID</label>
+            <input type="text" name="txid" placeholder="Transaction ID" required>
+            <button type="submit">Redeem</button>
+        </form>
+        <p><a href="/admin/payments">Admin: Review Payments</a></p>
+    </div>
+</body>
+</html>
