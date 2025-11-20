@@ -1,0 +1,27 @@
+# MANUAL COMMANDS TO RUN ON VPS
+# Copy and paste these one by one:
+
+# 1. Check recent balance logs
+cd ~/bot && tail -500 bot.log | grep -iE "balance|Got exchange|Position sizing|insufficient" | tail -30
+
+# 2. Check which exchange is used
+cd ~/bot && tail -500 bot.log | grep -iE "bybit|testnet|exchange.*selected|Router selected" | tail -20
+
+# 3. Check balance fetch attempts
+cd ~/bot && tail -500 bot.log | grep -iE "fetch_balance|Got exchange balance|💰.*balance" | tail -20
+
+# 4. Find all balance values
+cd ~/bot && tail -1000 bot.log | grep -oE '\$[0-9]+\.[0-9]+|\$[0-9]+' | sort -u | tail -20
+
+# 5. Check execution with balance context
+cd ~/bot && tail -300 bot.log | grep -B 5 -A 10 "insufficient.*balance\|Got exchange balance\|Position sizing" | tail -40
+
+# 6. Check testnet API config
+cd ~/bot && if [ -f ".env" ]; then grep -E "BYBIT|TESTNET|API.*KEY" .env | grep -v "^#"; else echo ".env not found"; fi
+
+# 7. Check balance source
+cd ~/bot && tail -500 bot.log | grep -E "Got exchange balance|Using orchestrator balance|Using fallback balance" | tail -15
+
+# OR RUN THE SCRIPT:
+cd ~/bot && curl -s https://raw.githubusercontent.com/TechCodinz/Lean-Trader/continue-from-micro-fix/CHECK_BALANCE_MANUAL.sh -o CHECK_BALANCE.sh && chmod +x CHECK_BALANCE.sh && ./CHECK_BALANCE.sh
+
