@@ -23,9 +23,9 @@ async def generate_endpoint(req: LicenseRequest):
     try:
         # We don't save files on Vercel, we just get the data
         # create_license returns (data, filepath)
-        # We only care about 'data'
+        # We only care about 'data', pass save_file=False
         data, _ = license_logic.create_license(
-            req.plan, req.email, req.hwid, req.custom_key
+            req.plan, req.email, req.hwid, req.custom_key, save_file=False
         )
         if not data:
             raise HTTPException(status_code=400, detail="Invalid plan or generation failed")
