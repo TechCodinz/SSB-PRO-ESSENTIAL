@@ -827,9 +827,10 @@
           <span class="accent">Sol Sniper Bot PRO</span>
         </h1>
         <p class="hero-sub">
-          AI-powered sniper for Pump.fun + Raydium entries. Filters rugs, scores new tokens,
-          auto-buys, and manages TP/SL — so you don’t chase charts all day. Comes with a built-in
-          DRY RUN engine for safe testing and a PRO MAX live mode for real entries.
+          AI-powered sniper for Pump.fun + Raydium. <strong>Instantly blocks freeze-authority rugs</strong>, scores
+          tokens
+          with AI, and front-runs trades using <strong>Priority Fee Turbo</strong>. Includes a safe DRY RUN engine for
+          testing.
         </p>
         <div class="hero-points">
           <span>⚡ <strong>Ultra-fast</strong> Pump.fun detection</span>
@@ -913,21 +914,21 @@
       </p>
       <div class="grid-2" style="margin-top: 12px;">
         <div>
-          <h3 style="font-size:14px; margin-bottom:4px;">🧠 AI Risk Engine v3</h3>
+          <h3 style="font-size:14px; margin-bottom:4px;">🧠 AI Risk Engine v3 + Smart Exits</h3>
           <ul>
-            <li>Analyzes liquidity, FDV, 5m volume and trade flow in seconds.</li>
-            <li>Scores each token on a 0–100 confidence scale before entry.</li>
-            <li>Penalizes suspicious behaviour &amp; bot-heavy movements.</li>
-            <li>Engine profiles tuned for STANDARD, PRO and ELITE users.</li>
+            <li>Scores token confidence (0–100) based on liq/volume/flow.</li>
+            <li><strong>Diamond Hands Mode:</strong> Auto-retries failed sells with higher slippage.</li>
+            <li>Never gets stuck with a bag due to network congestion.</li>
+            <li>Tuned profiles for STANDARD, PRO and ELITE users.</li>
           </ul>
         </div>
         <div>
-          <h3 style="font-size:14px; margin-bottom:4px;">🛡️ Anti-Rug &amp; Honeypot Filters</h3>
+          <h3 style="font-size:14px; margin-bottom:4px;">🛡️ Freeze Authority & Anti-Rug</h3>
           <ul>
-            <li>Honeypot heuristics + liquidity anomaly checks.</li>
-            <li>Soft-blocks tokens with no sells but spam buys.</li>
-            <li>Filters thin liquidity & fake volume spikes.</li>
-            <li>Configurable minimum liq &amp; 5-minute volume thresholds.</li>
+            <li><strong>Instant Freeze Check:</strong> Blocks tokens with 'Freeze Authority' enabled.</li>
+            <li>Filters honeypots, fake volume, and no-sell tokens.</li>
+            <li>Scans metadata in milliseconds before buying.</li>
+            <li>Configurable minimum liquidity & volume thresholds.</li>
           </ul>
         </div>
       </div>
@@ -1004,39 +1005,53 @@
             <td class="compare-highlight">✔ PRO MAX tuning</td>
           </tr>
           <tr>
-            <td>DRY RUN Simulation</td>
-            <td>✔ Unlimited</td>
-            <td>✔ Included</td>
-            <td>✔ Included</td>
-            <td>✔ Included</td>
+            <td>Freeze Auth Blocking</td>
+            <td>✔ Yes</td>
+            <td>✔ Yes</td>
+            <td>✔ Yes</td>
+            <td>✔ Yes (Instant)</td>
+          </tr>
+          <tr>
+            <td>Trailing Stop-Loss</td>
+            <td>—</td>
+            <td>—</td>
+            <td>✔ Yes</td>
+            <td class="compare-highlight">✔ Dynamic</td>
+          </tr>
+          <tr>
+            <td>Priority Fee Speed</td>
+            <td>Standard</td>
+            <td>1x Market</td>
+            <td>1.5x Boost</td>
+            <td class="compare-highlight">2x Turbo (Frontrun)</td>
+          </tr>
+          <tr>
+            <td>Early Entry Sniper</td>
+            <td>—</td>
+            <td>—</td>
+            <td>—</td>
+            <td class="compare-highlight">0.5s Headstart</td>
           </tr>
           <tr>
             <td>Live Trading</td>
             <td>✖ No</td>
-            <td>✔ Yes (with limits)</td>
-            <td>✔ Yes (balanced)</td>
-            <td class="compare-highlight">✔ Yes (aggressive profile)</td>
+            <td>✔ Yes (Limits)</td>
+            <td>✔ Yes (Balanced)</td>
+            <td class="compare-highlight">✔ Yes (Aggressive)</td>
           </tr>
           <tr>
             <td>Max Trades / Hour</td>
             <td>—</td>
-            <td>Safer, lower cap</td>
-            <td>Balanced cap</td>
-            <td class="compare-highlight">Higher cap (still filtered)</td>
-          </tr>
-          <tr>
-            <td>Max Open Positions</td>
-            <td>—</td>
-            <td>Lower</td>
-            <td>Standard</td>
-            <td>Higher (still capped)</td>
+            <td>Safer Cap</td>
+            <td>Balanced Cap</td>
+            <td class="compare-highlight">1.5x Volume Cap</td>
           </tr>
           <tr>
             <td>Devices / HWID</td>
             <td>Demo only</td>
             <td>1 device</td>
             <td>1 device</td>
-            <td>2–3 devices (per license rules)</td>
+            <td>2–3 devices</td>
           </tr>
         </tbody>
       </table>
@@ -1089,9 +1104,9 @@
           <div class="price-note">For testing, learning &amp; simulation.</div>
           <ul>
             <li>Full AI Risk Engine (v3).</li>
+            <li><strong>Freeze Authority Blocking.</strong></li>
             <li>GUI dashboard + CLI mode.</li>
             <li>DRY RUN simulation only (no real trades).</li>
-            <li>Perfect for learning the bot &amp; watching behaviour.</li>
             <li>1 license (1 machine).</li>
           </ul>
           <div class="price-cta">
@@ -1116,10 +1131,10 @@
           <div class="price-note">For active Solana traders.</div>
           <ul>
             <li>Everything in STANDARD.</li>
-            <li>Live trading (real SOL orders).</li>
-            <li>PRO engine: balanced risk &amp; speed.</li>
-            <li>TP/SL automation + live DRY RUN &amp; live alerts.</li>
-            <li>Telegram alerts (when configured).</li>
+            <li><strong>Live Trading Enabled.</strong></li>
+            <li><strong>Trailing Stop-Loss (Auto).</strong></li>
+            <li>1.5x Priority Fee Boost.</li>
+            <li>Smart Sell Retry (Diamond Hands).</li>
             <li>1 license (1 machine).</li>
           </ul>
           <div class="price-cta">
@@ -1140,10 +1155,11 @@
           <div class="price-note">For serious long-term users.</div>
           <ul>
             <li>Everything in PRO.</li>
+            <li><strong>2x Turbo Priority Fees (Frontrun).</strong></li>
+            <li><strong>0.5s Early Entry Boost.</strong></li>
             <li>Lifetime updates for this product line.</li>
-            <li>Engine tuned in PRO MAX profile (faster entries, still filtered).</li>
-            <li>Multi-device allowance (2–3 HWIDs, per agreement).</li>
-            <li>Priority support + upgrade path when new engines drop.</li>
+            <li>Multi-device (2–3 HWIDs).</li>
+            <li>Priority Support via Telegram.</li>
           </ul>
           <div class="price-cta">
             <button class="btn-outline" onclick="scrollToPayment('ELITE')">
