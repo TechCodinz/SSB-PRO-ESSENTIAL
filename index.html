@@ -428,6 +428,62 @@
             color: var(--text-muted);
             border-top: 1px solid rgba(255, 255, 255, 0.1);
         }
+
+        /* Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+        }
+
+        .modal.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background: var(--bg-card);
+            border-radius: 20px;
+            padding: 40px;
+            max-width: 500px;
+            width: 90%;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            text-align: center;
+        }
+
+        .modal-content h2 {
+            margin-bottom: 20px;
+            color: var(--accent-cyan);
+        }
+
+        .wallet-address {
+            background: #1e293b;
+            padding: 15px;
+            border-radius: 10px;
+            font-family: monospace;
+            font-size: 14px;
+            margin: 20px 0;
+            word-break: break-all;
+            border: 1px solid rgba(34, 211, 238, 0.2);
+            color: var(--accent-cyan);
+        }
+
+        .close-btn {
+            background: transparent;
+            border: none;
+            color: var(--text-muted);
+            font-size: 24px;
+            cursor: pointer;
+            float: right;
+            margin-top: -20px;
+            margin-right: -20px;
+        }
     </style>
 </head>
 
@@ -585,362 +641,94 @@
                 <ul class="plan-features">
                     <li>✓ LIVE Trading Mode</li>
                     <li>✓ 18 trades/hour</li>
-                    .step-card h3 {
-                    color: var(--accent-cyan);
-                    margin-bottom: 15px;
-                    font-size: 20px;
-                    }
 
-                    .step-card p {
-                    color: var(--text-muted);
-                    line-height: 1.6;
-                    }
+                    <li>✓ 10 open positions</li>
+                    <li>✓ Elite risk engine</li>
+                    <li>✓ Early entry boost</li>
+                </ul>
+                <button class="btn btn-secondary" onclick="openModal('ELITE', 899)">Get Elite</button>
+            </div>
+        </div>
+    </section>
 
-                    .step-card code {
-                    background: rgba(255, 255, 255, 0.1);
-                    padding: 2px 6px;
-                    border-radius: 4px;
-                    font-family: monospace;
-                    color: var(--text-primary);
-                    }
+    <!-- Payment Modal -->
+    <div class="modal" id="payment-modal">
+        <div class="modal-content">
+            <button class="close-btn" onclick="closeModal()">&times;</button>
+            <h2>Complete Payment</h2>
+            <p style="color: var(--text-muted); margin-bottom: 20px;">
+                Plan: <strong id="modal-plan">-</strong> • Amount: <strong id="modal-amount">$0</strong> USDT
+            </p>
 
-                    .alert-box {
-                    max-width: 800px;
-                    margin: 40px auto 0;
-                    background: rgba(250, 204, 21, 0.1);
-                    /* warning color alpha */
-                    border: 1px solid var(--warning);
-                    padding: 20px;
-                    border-radius: 12px;
-                    text-align: center;
-                    color: var(--warning);
-                    }
+            <div id="order-step">
+                <p style="margin-bottom: 20px;">1. Send exact amount (TRC20) to:</p>
+                <div class="wallet-address" id="modal-wallet">TBxck6t1a3pZE2YLho4Su1PcGKd2yK2zD4</div>
+                <p style="margin-bottom: 20px;">2. Send TX Hash & Email to Telegram:</p>
+                <a href="https://t.me/SSB_OrderBot" target="_blank" class="btn btn-primary">Open Telegram Support</a>
+            </div>
+        </div>
+    </div>
 
-                    /* Modal */
-                    .modal {
-                    display: none;
-                    position: fixed;
-                    top: 0;
-                    left: 0;
-                    right: 0;
-                    bottom: 0;
-                    background: rgba(0, 0, 0, 0.8);
-                    align-items: center;
-                    justify-content: center;
-                    z-index: 1000;
-                    }
+    <!-- Footer -->
+    <footer class="footer">
+        <p>© 2025 Sol Sniper Bot PRO. Trade responsibly. Not financial advice.</p>
+    </footer>
 
-                    .modal.active {
-                    display: flex;
-                    }
+    <script>
+        // Simulated live trading demo
+        const logs = [
+            { text: '⚡ Engine started - ELITE mode', class: 'log-info' },
+            { text: '🔌 Connected to Pump.fun stream', class: 'log-success' },
+            { text: '🚀 NEW TOKEN: 5xK8...2Fm9', class: 'log-success' },
+            { text: '📊 Analyzing risk... Confidence: 82.4%', class: 'log-info' },
+            { text: '🟢 BUY EXECUTED: 0.25 SOL → 5xK8...', class: 'log-success' },
+            { text: '🚀 NEW TOKEN: 9aB2...7Xm1', class: 'log-success' },
+            { text: '📊 Analyzing risk... Confidence: 45.2%', class: 'log-info' },
+            { text: '❌ REJECTED: Low confidence', class: 'log-warning' },
+            { text: '💰 SELL (TP): 5xK8... +287%', class: 'log-success' },
+            { text: '🚀 NEW TOKEN: 3mN7...4Ks8', class: 'log-success' },
+        ];
 
-                    .modal-content {
-                    background: var(--bg-card);
-                    border-radius: 20px;
-                    padding: 40px;
-                    max-width: 500px;
-                    width: 90%;
-                    border: 1px solid rgba(255, 255, 255, 0.1);
-                    text-align: center;
-                    }
+        const terminal = document.getElementById('terminal');
+        let i = 0;
 
-                    .modal-content h2 {
-                    margin-bottom: 20px;
-                    color: var(--accent-cyan);
-                    }
+        function addLog() {
+            if (i >= logs.length) {
+                terminal.innerHTML = '';
+                i = 0;
+            }
+            const log = logs[i];
+            const line = document.createElement('div');
+            line.className = `log-line ${log.class}`;
+            line.style.animationDelay = '0s';
+            line.textContent = `[${new Date().toLocaleTimeString()}] ${log.text}`;
+            terminal.appendChild(line);
+            terminal.scrollTop = terminal.scrollHeight;
+            i++;
+        }
 
-                    .wallet-address {
-                    background: #1e293b;
-                    padding: 15px;
-                    border-radius: 10px;
-                    font-family: monospace;
-                    font-size: 14px;
-                    margin: 20px 0;
-                    word-break: break-all;
-                    border: 1px solid rgba(34, 211, 238, 0.2);
-                    color: var(--accent-cyan);
-                    }
+        // Start demo
+        setInterval(addLog, 2000);
+        addLog();
 
-                    .close-btn {
-                    background: transparent;
-                    border: none;
-                    color: var(--text-muted);
-                    font-size: 24px;
-                    cursor: pointer;
-                    float: right;
-                    margin-top: -20px;
-                    margin-right: -20px;
-                    }
+        // Modal Logic
+        function openModal(plan, price) {
+            document.getElementById('modal-plan').textContent = plan;
+            document.getElementById('modal-amount').textContent = '$' + price;
+            document.getElementById('payment-modal').classList.add('active');
+        }
 
-                    /* Footer */
-                    .footer {
-                    text-align: center;
-                    padding: 60px 20px;
-                    color: var(--text-muted);
-                    border-top: 1px solid rgba(255, 255, 255, 0.1);
-                    }
-                    </style>
-                    </head>
+        function closeModal() {
+            document.getElementById('payment-modal').classList.remove('active');
+        }
 
-                    <body>
-                        <!-- Hero -->
-                        <section class="hero">
-                            <div class="logo-big">SSB</div>
-                            <h1>Sol Sniper Bot PRO</h1>
-                            <p class="tagline">The #1 Pump.fun Solana Trading Bot. Automated sniping, anti-rug
-                                protection, and 24/7 cloud
-                                operation. Make profits while you sleep.</p>
-
-                            <div class="cta-buttons">
-                                <a href="./SolSniperBotPRO.zip" class="btn btn-primary" download>🚀 Download Free
-                                    Demo</a>
-                                <a href="#setup" class="btn btn-secondary">📘 Setup Guide</a>
-                            </div>
-
-                            <div class="stats-bar">
-                                <div class="stat">
-                                    <div class="stat-value">50K+</div>
-                                    <div class="stat-label">Tokens Sniped</div>
-                                </div>
-                                <div class="stat">
-                                    <div class="stat-value">2.3M+</div>
-                                    <div class="stat-label">SOL Volume</div>
-                                </div>
-                                <div class="stat">
-                                    <div class="stat-value">99.9%</div>
-                                    <div class="stat-label">Uptime</div>
-                                </div>
-                                <div class="stat">
-                                    <div class="stat-value">500+</div>
-                                    <div class="stat-label">Active Users</div>
-                                </div>
-                            </div>
-                        </section>
-
-                        <!-- Instructions / Quick Start -->
-                        <section class="instructions" id="setup">
-                            <h2 class="section-title">Quick Start Guide</h2>
-                            <div class="steps-grid">
-                                <div class="step-card">
-                                    <h3>1. Download & Unzip</h3>
-                                    <p>Click "Download Free Demo" above. Extract the ZIP file to a folder on your
-                                        computer (Windows 10/11).
-                                    </p>
-                                </div>
-                                <div class="step-card">
-                                    <h3>2. Configure</h3>
-                                    <p>Rename <code>config.sample.json</code> to <code>config.json</code>.
-                                        Open it and set your <b>private_key</b> (for trading) and <b>rpc</b> (use Helius
-                                        or QuickNode for
-                                        best speed).</p>
-                                </div>
-                                <div class="step-card">
-                                    <h3>3. Run & Trade</h3>
-                                    <p>Double-click <code>gui_main.exe</code>. Select "Try Free Demo" or enter your
-                                        license key to go LIVE!
-                                    </p>
-                                </div>
-                            </div>
-                            <div class="alert-box">
-                                <p><strong>💡 Pro Tip:</strong> Use a dedicated wallet with small funds for testing. Get
-                                    a free fast RPC
-                                    from <a href="https://helius.dev" target="_blank"
-                                        style="color:var(--text-primary);">Helius.dev</a>.</p>
-                            </div>
-                        </section>
-
-                        <!-- Features -->
-                        <section class="features">
-                            <h2 class="section-title">Why Traders Choose Us</h2>
-                            <div class="features-grid">
-                                <div class="feature-card">
-                                    <div class="feature-icon">⚡</div>
-                                    <h3 class="feature-title">Lightning Fast Entries</h3>
-                                    <p class="feature-desc">Snipe new tokens within seconds of launch. Our engine
-                                        connects directly to
-                                        Pump.fun for instant detection.</p>
-                                </div>
-                                <div class="feature-card">
-                                    <div class="feature-icon">🛡️</div>
-                                    <h3 class="feature-title">Anti-Rug Protection</h3>
-                                    <p class="feature-desc">Advanced honeypot detection, freeze authority checks, and
-                                        liquidity analysis
-                                        protect you from scams.</p>
-                                </div>
-                                <div class="feature-card">
-                                    <div class="feature-icon">☁️</div>
-                                    <h3 class="feature-title">24/7 Cloud Bot</h3>
-                                    <p class="feature-desc">Your bot runs in the cloud forever. No downloads, no setup.
-                                        Trade from any
-                                        device, anywhere.</p>
-                                </div>
-                                <div class="feature-card">
-                                    <div class="feature-icon">📊</div>
-                                    <h3 class="feature-title">Smart Risk Engine</h3>
-                                    <p class="feature-desc">AI-powered confidence scoring analyzes liquidity, volume,
-                                        holder distribution,
-                                        and more.</p>
-                                </div>
-                                <div class="feature-card">
-                                    <div class="feature-icon">💰</div>
-                                    <h3 class="feature-title">Auto TP/SL</h3>
-                                    <p class="feature-desc">Set your take-profit and stop-loss levels. The bot executes
-                                        exits automatically.
-                                    </p>
-                                </div>
-                                <div class="feature-card">
-                                    <div class="feature-icon">📱</div>
-                                    <h3 class="feature-title">Telegram Alerts</h3>
-                                    <p class="feature-desc">Get instant notifications for every trade. Stay informed
-                                        without watching
-                                        charts.</p>
-                                </div>
-                            </div>
-                        </section>
-
-                        <!-- Live Demo -->
-                        <section class="demo-section" id="demo">
-                            <h2 class="section-title">See It In Action</h2>
-                            <div class="demo-terminal">
-                                <div class="terminal-header">
-                                    <div class="terminal-dot" style="background: #ff5f56;"></div>
-                                    <div class="terminal-dot" style="background: #ffbd2e;"></div>
-                                    <div class="terminal-dot" style="background: #27c93f;"></div>
-                                </div>
-                                <div class="terminal-content" id="terminal"></div>
-                            </div>
-                        </section>
-
-                        <!-- Pricing -->
-                        <section class="pricing" id="pricing">
-                            <h2 class="section-title">Choose Your Plan</h2>
-                            <div class="plans">
-                                <div class="plan">
-                                    <h3 class="plan-name">STANDARD</h3>
-                                    <div class="plan-price">$199<span> USDT</span></div>
-                                    <p style="color: var(--text-muted);">Lifetime Access</p>
-                                    <ul class="plan-features">
-                                        <li>✓ LIVE Trading Mode</li>
-                                        <li>✓ 7 trades/hour</li>
-                                        <li>✓ 5 open positions</li>
-                                        <li>✓ Basic risk engine</li>
-                                        <li>✗ Trailing stop-loss</li>
-                                    </ul>
-                                    <button class="btn btn-secondary" onclick="openModal('STANDARD', 199)">Get
-                                        Standard</button>
-                                </div>
-                                <div class="plan featured">
-                                    <span class="plan-badge">MOST POPULAR</span>
-                                    <h3 class="plan-name" style="color: var(--accent-purple);">PRO</h3>
-                                    <div class="plan-price">$499<span> USDT</span></div>
-                                    <p style="color: var(--text-muted);">Lifetime Access</p>
-                                    <ul class="plan-features">
-                                        <li>✓ LIVE Trading Mode</li>
-                                        <li>✓ 12 trades/hour</li>
-                                        <li>✓ 8 open positions</li>
-                                        <li>✓ Pro risk engine</li>
-                                        <li>✓ Trailing stop-loss</li>
-                                    </ul>
-                                    <button class="btn btn-primary" onclick="openModal('PRO', 499)">Get Pro</button>
-                                </div>
-                                <div class="plan">
-                                    <h3 class="plan-name" style="color: var(--warning);">ELITE</h3>
-                                    <div class="plan-price">$899<span> USDT</span></div>
-                                    <p style="color: var(--text-muted);">Lifetime Access</p>
-                                    <ul class="plan-features">
-                                        <li>✓ LIVE Trading Mode</li>
-                                        <li>✓ 18 trades/hour</li>
-                                        <li>✓ 10 open positions</li>
-                                        <li>✓ Elite risk engine</li>
-                                        <li>✓ Early entry boost</li>
-                                    </ul>
-                                    <button class="btn btn-secondary" onclick="openModal('ELITE', 899)">Get
-                                        Elite</button>
-                                </div>
-                            </div>
-                        </section>
-
-                        <!-- Payment Modal -->
-                        <div class="modal" id="payment-modal">
-                            <div class="modal-content">
-                                <button class="close-btn" onclick="closeModal()">&times;</button>
-                                <h2>Complete Payment</h2>
-                                <p style="color: var(--text-muted); margin-bottom: 20px;">
-                                    Plan: <strong id="modal-plan">-</strong> • Amount: <strong
-                                        id="modal-amount">$0</strong> USDT
-                                </p>
-
-                                <div id="order-step">
-                                    <p style="margin-bottom: 20px;">1. Send exact amount (TRC20) to:</p>
-                                    <div class="wallet-address" id="modal-wallet">TBxck6t1a3pZE2YLho4Su1PcGKd2yK2zD4
-                                    </div>
-                                    <p style="margin-bottom: 20px;">2. Send TX Hash & Email to Telegram:</p>
-                                    <a href="https://t.me/SSB_OrderBot" target="_blank" class="btn btn-primary">Open
-                                        Telegram Support</a>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Footer -->
-                        <footer class="footer">
-                            <p>© 2025 Sol Sniper Bot PRO. Trade responsibly. Not financial advice.</p>
-                        </footer>
-
-                        <script>
-                            // Simulated live trading demo
-                            const logs = [
-                                { text: '⚡ Engine started - ELITE mode', class: 'log-info' },
-                                { text: '🔌 Connected to Pump.fun stream', class: 'log-success' },
-                                { text: '🚀 NEW TOKEN: 5xK8...2Fm9', class: 'log-success' },
-                                { text: '📊 Analyzing risk... Confidence: 82.4%', class: 'log-info' },
-                                { text: '🟢 BUY EXECUTED: 0.25 SOL → 5xK8...', class: 'log-success' },
-                                { text: '🚀 NEW TOKEN: 9aB2...7Xm1', class: 'log-success' },
-                                { text: '📊 Analyzing risk... Confidence: 45.2%', class: 'log-info' },
-                                { text: '❌ REJECTED: Low confidence', class: 'log-warning' },
-                                { text: '💰 SELL (TP): 5xK8... +287%', class: 'log-success' },
-                                { text: '🚀 NEW TOKEN: 3mN7...4Ks8', class: 'log-success' },
-                            ];
-
-                            const terminal = document.getElementById('terminal');
-                            let i = 0;
-
-                            function addLog() {
-                                if (i >= logs.length) {
-                                    terminal.innerHTML = '';
-                                    i = 0;
-                                }
-                                const log = logs[i];
-                                const line = document.createElement('div');
-                                line.className = `log-line ${log.class}`;
-                                line.style.animationDelay = '0s';
-                                line.textContent = `[${new Date().toLocaleTimeString()}] ${log.text}`;
-                                terminal.appendChild(line);
-                                terminal.scrollTop = terminal.scrollHeight;
-                                i++;
-                            }
-
-                            // Start demo
-                            setInterval(addLog, 2000);
-                            addLog();
-
-                            // Modal Logic
-                            function openModal(plan, price) {
-                                document.getElementById('modal-plan').textContent = plan;
-                                document.getElementById('modal-amount').textContent = '$' + price;
-                                document.getElementById('payment-modal').classList.add('active');
-                            }
-
-                            function closeModal() {
-                                document.getElementById('payment-modal').classList.remove('active');
-                            }
-
-                            // Close modal on click outside
-                            window.onclick = function (event) {
-                                if (event.target == document.getElementById('payment-modal')) {
-                                    closeModal();
-                                }
-                            }
-                        </script>
-                    </body>
+        // Close modal on click outside
+        window.onclick = function (event) {
+            if (event.target == document.getElementById('payment-modal')) {
+                closeModal();
+            }
+        }
+    </script>
+</body>
 
 </html>
