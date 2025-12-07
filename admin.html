@@ -160,8 +160,13 @@
                 });
 
                 if (!res.ok) {
-                    const err = await res.json();
-                    throw new Error(err.detail || "Request failed");
+                    const text = await res.text();
+                    try {
+                        const jsonErr = JSON.parse(text);
+                        throw new Error(jsonErr.detail || res.statusText);
+                    } catch (e) {
+                        throw new Error(`Server Error (${res.status}): ${res.statusText}`);
+                    }
                 }
 
                 const json = await res.json();
