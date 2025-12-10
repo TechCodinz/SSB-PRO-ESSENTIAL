@@ -82,8 +82,23 @@ async def update_config(
                 # Encrypt
                 updates["private_key"] = _encrypt_key(request.private_key)
                 
-                # TODO: Fetch real balance via RPC
-                balance = 0.0 
+                # Fetch real balance via RPC
+                import httpx
+                rpc_url = settings.HELIUS_RPC or "https://api.mainnet-beta.solana.com"
+                try:
+                    async with httpx.AsyncClient(timeout=10.0) as client:
+                        resp = await client.post(rpc_url, json={
+                            "jsonrpc": "2.0",
+                            "id": 1,
+                            "method": "getBalance",
+                            "params": [wallet_address]
+                        })
+                        data = resp.json()
+                        lamports = data.get("result", {}).get("value", 0)
+                        balance = lamports / 1_000_000_000  # Convert to SOL
+                except Exception as rpc_err:
+                    print(f"[RPC] Balance fetch failed: {rpc_err}")
+                    balance = 0.0
                 
             except Exception as e:
                 raise HTTPException(status_code=400, detail=f"Invalid private key: {str(e)}")

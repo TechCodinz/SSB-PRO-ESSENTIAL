@@ -8,10 +8,13 @@ from fastapi.responses import JSONResponse
 import logging
 
 # Import routers
-from api.routers import auth, license, orders, user, bot, simulation, referral
+from api.routers import auth, license, orders, user, bot, simulation, referral, copy_trading
 from api.middleware.rate_limit import RateLimitMiddleware
 from api.database import engine, Base
 from api.models import user as user_model, order as order_model, license as license_model
+
+# Import Copy Trading model to create table
+from api.routers.copy_trading import CopyRelation
 
 # Create tables
 Base.metadata.create_all(bind=engine)
@@ -55,6 +58,7 @@ app.include_router(user.router, prefix="/v1/user", tags=["User"])
 app.include_router(bot.router, prefix="/v1/bot", tags=["Bot"])
 app.include_router(simulation.router, prefix="/v1/simulation", tags=["Simulation"])
 app.include_router(referral.router, prefix="/v1/referral", tags=["Referral"])
+app.include_router(copy_trading.router, prefix="/v1/copy", tags=["Copy Trading"])
 
 
 @app.get("/")

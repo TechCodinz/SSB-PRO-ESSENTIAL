@@ -229,6 +229,7 @@
         body.sim-mode .logo {
             background: linear-gradient(90deg, #4ade80, #22c55e);
             -webkit-background-clip: text;
+            background-clip: text;
             -webkit-text-fill-color: transparent;
         }
     </style>
@@ -245,6 +246,7 @@
         <a href="#" class="nav-item" onclick="switchTab('wallet', this)">Wallet & RPC</a>
         <a href="#" class="nav-item" onclick="switchTab('affiliate', this)">💸 Affiliate</a>
         <a href="#" class="nav-item" onclick="switchTab('leaderboard', this)">🏆 Leaderboard</a>
+        <a href="#" class="nav-item" onclick="switchTab('copytrading', this)">🔄 Copy Trading</a>
         <a href="#" class="nav-item" onclick="logout()">Logout</a>
     </div>
 
@@ -450,6 +452,42 @@
                 </table>
             </div>
         </div>
+
+        <!-- Copy Trading View -->
+        <div id="view-copytrading" style="display:none; max-width: 900px;">
+            <header>
+                <div>
+                    <h1 style="margin:0; font-size:24px;">🔄 Copy Trading</h1>
+                    <div style="font-size:12px; color:var(--muted); margin-top:4px;">Automatically copy trades from top
+                        performers</div>
+                </div>
+            </header>
+
+            <div class="card"
+                style="margin-bottom:24px; background: linear-gradient(135deg, rgba(34,211,238,0.1), rgba(168,85,247,0.05));">
+                <h3 style="margin-top:0; color:var(--accent);">🎯 How It Works</h3>
+                <p style="font-size:13px; color:var(--muted);">
+                    1. Browse top performers below<br>
+                    2. Click "Follow" to start copying their trades<br>
+                    3. Set your allocation % and max trade size<br>
+                    4. Sit back and profit from their expertise!
+                </p>
+            </div>
+
+            <!-- Top Leaders to Copy -->
+            <h3 style="margin-bottom:16px;">🏆 Top Performers Available</h3>
+            <div id="copy-leaders-grid"
+                style="display:grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap:16px;">
+                <div class="card" style="text-align:center; padding:20px; color:var(--muted);">Loading top leaders...
+                </div>
+            </div>
+
+            <!-- My Active Copies -->
+            <h3 style="margin-top:32px; margin-bottom:16px;">📊 Your Active Copies</h3>
+            <div id="my-copies-list" class="card">
+                <div style="padding:20px; text-align:center; color:var(--muted);">You're not copying anyone yet.</div>
+            </div>
+        </div>
     </div>
 
     <script>
@@ -569,6 +607,7 @@
             document.getElementById('view-wallet').style.display = 'none';
             document.getElementById('view-affiliate').style.display = 'none';
             document.getElementById('view-leaderboard').style.display = 'none';
+            document.getElementById('view-copytrading').style.display = 'none';
 
             // Show selected
             document.getElementById('view-' + viewId).style.display = 'block';
@@ -580,6 +619,7 @@
             // Load data for specific views
             if (viewId === 'affiliate') loadReferralStats();
             if (viewId === 'leaderboard') loadLeaderboard();
+            if (viewId === 'copytrading') loadCopyTrading();
         }
 
         // Configuration
@@ -699,6 +739,109 @@
                 });
             } catch (e) {
                 console.error('Failed to load leaderboard', e);
+            }
+        }
+
+        // ========== COPY TRADING ==========
+        async function loadCopyTrading() {
+            await loadCopyLeaders();
+            await loadMyCopies();
+        }
+
+        async function loadCopyLeaders() {
+            try {
+                const res = await fetch(`${API}/copy/leaders`);
+                const data = await res.json();
+
+                const grid = document.getElementById('copy-leaders-grid');
+                grid.innerHTML = '';
+
+                data.leaders.forEach(leader => {
+                    const pnlColor = leader.total_pnl >= 0 ? '#4ade80' : '#f87171';
+                    const card = `
+                        <div class="card" style="padding:16px;">
+                            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
+                                <div style="font-weight:700;">${leader.username}</div>
+                                <div style="font-size:11px; color:var(--muted);">${leader.followers} followers</div>
+                            </div>
+                            <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-bottom:12px;">
+                                <div>
+                                    <div style="font-size:11px; color:var(--muted);">Total PnL</div>
+                                    <div style="font-weight:700; color:${pnlColor};">${leader.total_pnl >= 0 ? '+' : ''}$${leader.total_pnl.toFixed(0)}</div>
+                                </div>
+                                <div>
+                                    <div style="font-size:11px; color:var(--muted);">Win Rate</div>
+                                    <div style="font-weight:700;">${leader.win_rate.toFixed(0)}%</div>
+                                </div>
+                            </div>
+                            <div style="margin-bottom:12px;">${leader.badges.slice(0, 3).join(' ')}</div>
+                            <button class="btn btn-primary" onclick="followLeader('${leader.user_id}')" style="width:100%;">🔄 FOLLOW</button>
+                        </div>
+                    `;
+                    grid.innerHTML += card;
+                });
+            } catch (e) {
+                console.error('Failed to load copy leaders', e);
+            }
+        }
+
+        async function followLeader(leaderId) {
+            const token = localStorage.getItem('ssb_token');
+            try {
+                const res = await fetch(`${API}/copy/follow`, {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        leader_id: leaderId,
+                        allocation_percent: 10,
+                        max_trade_size: 0.5
+                    })
+                });
+                const data = await res.json();
+
+                if (data.success) {
+                    alert('✅ ' + data.message);
+                    loadCopyTrading();
+                } else {
+                    alert('❌ ' + data.detail);
+                }
+            } catch (e) {
+                alert('❌ Failed to follow');
+            }
+        }
+
+        async function loadMyCopies() {
+            const token = localStorage.getItem('ssb_token');
+            try {
+                const res = await fetch(`${API}/copy/my-copies`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                const data = await res.json();
+
+                const container = document.getElementById('my-copies-list');
+
+                if (data.active_copies.length === 0) {
+                    container.innerHTML = '<div style="padding:20px; text-align:center; color:var(--muted);">You\'re not copying anyone yet. Follow a top performer above!</div>';
+                    return;
+                }
+
+                container.innerHTML = data.active_copies.map(copy => `
+                    <div style="display:flex; justify-content:space-between; align-items:center; padding:12px; border-bottom:1px solid rgba(255,255,255,0.05);">
+                        <div>
+                            <div style="font-weight:600;">${copy.leader_name}</div>
+                            <div style="font-size:11px; color:var(--muted);">${copy.total_copied_trades} trades copied</div>
+                        </div>
+                        <div style="text-align:right;">
+                            <div style="font-weight:700; color:#4ade80;">+$${copy.total_pnl.toFixed(2)}</div>
+                            <div style="font-size:11px; color:var(--muted);">${copy.allocation}% allocation</div>
+                        </div>
+                    </div>
+                `).join('');
+            } catch (e) {
+                console.error('Failed to load my copies', e);
             }
         }
 

@@ -11,13 +11,13 @@ from sqlalchemy.orm import Session
 
 from api.config import settings, PLAN_PRICES
 from api.routers.license import generate_license_key
+from api.routers.referral import credit_referral_commission
 from api.database import get_db
 from api.models.order import Order
 from api.models.license import License
+from api.models.user import User
 
 router = APIRouter()
-
-# In-memory orders store (Removed)
 
 
 class OrderCreateRequest(BaseModel):
@@ -130,7 +130,21 @@ async def payment_webhook(payload: WebhookPayload, background_tasks: BackgroundT
     
     db.commit()
     
-    # Send email with license (background task - mocked)
+    # === REFERRAL COMMISSION ===
+    # Find the user who placed this order and credit their referrer
+    user = db.query(User).filter(User.email == order.email).first()
+    if user:
+        order_amount = PLAN_PRICES.get(order.plan, 0)
+        commission = credit_referral_commission(
+            referred_user_id=user.id,
+            order_amount=order_amount,
+            order_id=order.order_id,
+            db=db
+        )
+        if commission:
+            print(f"[REFERRAL] Credited ${commission:.2f} to referrer of {order.email}")
+    
+    # Send email with license (TODO: implement email service)
     # background_tasks.add_task(send_license_email, order.email, license_key, order.plan)
     
     return {
