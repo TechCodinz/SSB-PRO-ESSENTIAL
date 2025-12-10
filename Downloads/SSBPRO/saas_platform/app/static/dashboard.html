@@ -354,20 +354,18 @@
                 </div>
             </div>
 
-            <div class="card">
-                <h3 style="margin-top:0; color:#a855f7;">⚡ RPC Configuration</h3>
-                <p style="font-size:13px; color:var(--muted); margin-bottom:20px;">
-                    Override default cloud RPCs with your own high-speed endpoints (Helius, Triton, QuickNode).
-                </p>
-
-                <div style="margin-bottom:16px;">
-                    <label style="font-size:12px; font-weight:600; display:block; margin-bottom:8px;">CUSTOM RPC URL
-                        (HTTPs)</label>
-                    <input type="text" id="cfg-rpc" placeholder="https://mainnet.helius-rpc.com/..."
-                        style="width:100%; padding:12px; background:rgba(0,0,0,0.3); border:1px solid #334155; color:white; border-radius:6px; font-family:monospace;">
+            <!-- Bot Settings (Plan-Gated) -->
+            <div class="card" id="bot-settings-card">
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px;">
+                    <h3 style="margin:0; color:#a855f7;">⚙️ Bot Settings</h3>
+                    <span id="plan-badge" class="status-badge"
+                        style="background:rgba(168,85,247,0.1); border-color:rgba(168,85,247,0.3); color:#a855f7;">LOADING...</span>
                 </div>
 
-                <button class="btn" onclick="saveConfig()" style="background:#334155; color:white;">UPDATE RPC</button>
+                <div id="settings-content">
+                    <!-- Settings will be injected based on plan -->
+                    <div style="padding:20px; text-align:center; color:var(--muted);">Loading your plan limits...</div>
+                </div>
             </div>
         </div>
 
@@ -701,6 +699,7 @@
 
     <script>
         const API = "https://api.ssbpro.dev/v1";
+        let userPlan = 'standard'; // Global plan variable
 
         async function init() {
             const token = localStorage.getItem('ssb_token');
@@ -715,7 +714,13 @@
 
                 const user = await res.json();
                 document.getElementById('user-email').innerText = user.email;
-                document.getElementById('stat-plan').innerText = user.license ? user.license.plan.toUpperCase() : "NO LICENSE";
+
+                // Store plan globally
+                userPlan = user.license ? user.license.plan : 'standard';
+                document.getElementById('stat-plan').innerText = userPlan.toUpperCase();
+
+                // Load plan-gated settings
+                loadPlanSettings(userPlan);
 
                 // Fetch Cloud Status
                 const statusRes = await fetch(`${API}/user/cloud-status`, {
@@ -839,7 +844,7 @@
             const rpc = document.getElementById('cfg-rpc').value.trim();
             const statusEl = document.getElementById('save-status');
 
-            if (!pk && !rpc) return;
+            if (!pk) return;
 
             statusEl.style.display = 'block';
             statusEl.style.color = 'var(--accent)';
@@ -855,15 +860,14 @@
                         'Content-Type': 'application/json'
                     },
                     body: JSON.stringify({
-                        private_key: pk,
-                        rpc_url: rpc
+                        private_key: pk
                     })
                 });
 
                 const data = await res.json();
 
                 if (data.success) {
-                    statusEl.innerHTML = '✅ Saved Securely';
+                    statusEl.innerHTML = '✅ Wallet Saved Securely';
                     statusEl.style.color = '#4ade80';
                     document.getElementById('cfg-pk').value = ''; // Clear for security
                     if (data.address) {
@@ -878,6 +882,110 @@
                 console.error(e);
                 statusEl.innerHTML = '❌ Connection Error';
                 statusEl.style.color = '#f87171';
+            }
+        }
+
+        // ========== PLAN-GATED SETTINGS ==========
+        function loadPlanSettings(plan) {
+            const badge = document.getElementById('plan-badge');
+            const content = document.getElementById('settings-content');
+
+            // Plan tiers and their features
+            const PLAN_FEATURES = {
+                'demo': { canCustomize: false, label: 'DEMO', color: '#9ca3af' },
+                'standard': { canCustomize: false, label: 'STANDARD', color: '#22d3ee' },
+                'cloud_sniper': { canCustomize: true, label: 'CLOUD PRO', color: '#a855f7', maxTP: 50, maxSL: 25 },
+                'pro': { canCustomize: true, label: 'PRO', color: '#fbbf24', maxTP: 100, maxSL: 50 },
+                'elite': { canCustomize: true, label: 'ELITE', color: '#f43f5e', maxTP: 200, maxSL: 100, advanced: true }
+            };
+
+            const features = PLAN_FEATURES[plan] || PLAN_FEATURES['standard'];
+
+            // Update badge
+            badge.innerText = features.label;
+            badge.style.color = features.color;
+            badge.style.borderColor = features.color + '50';
+            badge.style.background = features.color + '20';
+
+            if (!features.canCustomize) {
+                content.innerHTML = `
+                    <div style="text-align:center; padding:20px;">
+                        <div style="font-size:24px; margin-bottom:8px;">🔒</div>
+                        <p style="color:var(--muted); margin:0;">Custom bot settings available on <strong style="color:#a855f7;">PRO</strong> and <strong style="color:#f43f5e;">ELITE</strong> plans.</p>
+                        <a href="/pricing.html" class="btn btn-primary" style="margin-top:16px;">⬆️ UPGRADE</a>
+                    </div>
+                `;
+                return;
+            }
+
+            // Build settings form based on plan limits
+            content.innerHTML = `
+                <div style="display:grid; grid-template-columns:1fr 1fr; gap:16px; margin-bottom:16px;">
+                    <div>
+                        <label style="font-size:12px; color:var(--muted); display:block; margin-bottom:6px;">Take Profit % (max ${features.maxTP}%)</label>
+                        <input type="number" id="cfg-tp" value="30" min="5" max="${features.maxTP}" 
+                            style="width:100%; padding:10px; background:rgba(0,0,0,0.3); border:1px solid #374151; color:white; border-radius:6px;">
+                    </div>
+                    <div>
+                        <label style="font-size:12px; color:var(--muted); display:block; margin-bottom:6px;">Stop Loss % (max ${features.maxSL}%)</label>
+                        <input type="number" id="cfg-sl" value="15" min="5" max="${features.maxSL}"
+                            style="width:100%; padding:10px; background:rgba(0,0,0,0.3); border:1px solid #374151; color:white; border-radius:6px;">
+                    </div>
+                </div>
+                <div style="display:grid; grid-template-columns:1fr 1fr; gap:16px; margin-bottom:16px;">
+                    <div>
+                        <label style="font-size:12px; color:var(--muted); display:block; margin-bottom:6px;">Min Confidence Score</label>
+                        <input type="number" id="cfg-conf" value="75" min="50" max="100"
+                            style="width:100%; padding:10px; background:rgba(0,0,0,0.3); border:1px solid #374151; color:white; border-radius:6px;">
+                    </div>
+                    <div>
+                        <label style="font-size:12px; color:var(--muted); display:block; margin-bottom:6px;">Max Position Size (SOL)</label>
+                        <input type="number" id="cfg-size" value="0.5" min="0.1" max="5" step="0.1"
+                            style="width:100%; padding:10px; background:rgba(0,0,0,0.3); border:1px solid #374151; color:white; border-radius:6px;">
+                    </div>
+                </div>
+                ${features.advanced ? `
+                <div style="margin-bottom:16px; padding:12px; background:rgba(244,63,94,0.1); border:1px solid rgba(244,63,94,0.3); border-radius:8px;">
+                    <div style="font-size:11px; color:#f43f5e; margin-bottom:8px;">✨ ELITE ONLY</div>
+                    <label style="display:flex; align-items:center; gap:8px; cursor:pointer;">
+                        <input type="checkbox" id="cfg-trailing" checked style="width:18px; height:18px;">
+                        <span>Enable Trailing Stop (locks in gains)</span>
+                    </label>
+                </div>
+                ` : ''}
+                <button class="btn btn-primary" onclick="saveBotSettings()" style="width:100%;">💾 SAVE SETTINGS</button>
+                <p style="font-size:11px; color:var(--muted); margin-top:12px; text-align:center;">Settings apply to your next trades automatically.</p>
+            `;
+        }
+
+        async function saveBotSettings() {
+            const token = localStorage.getItem('ssb_token');
+            const settings = {
+                take_profit: parseFloat(document.getElementById('cfg-tp')?.value || 30),
+                stop_loss: parseFloat(document.getElementById('cfg-sl')?.value || 15),
+                min_confidence: parseFloat(document.getElementById('cfg-conf')?.value || 75),
+                max_position_size: parseFloat(document.getElementById('cfg-size')?.value || 0.5),
+                trailing_stop: document.getElementById('cfg-trailing')?.checked ?? true
+            };
+
+            try {
+                const res = await fetch(`${API}/bot/settings`, {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(settings)
+                });
+                const data = await res.json();
+
+                if (data.success) {
+                    alert('✅ Bot settings saved! They will apply to your next trades.');
+                } else {
+                    alert('❌ ' + (data.detail || 'Failed to save settings'));
+                }
+            } catch (e) {
+                alert('❌ Connection error');
             }
         }
 

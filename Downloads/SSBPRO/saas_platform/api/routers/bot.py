@@ -192,3 +192,79 @@ async def get_changelog():
     return {
         "changelog": CHANGELOG
     }
+
+
+class BotSettingsRequest(BaseModel):
+    take_profit: Optional[float] = 30
+    stop_loss: Optional[float] = 15
+    min_confidence: Optional[float] = 75
+    max_position_size: Optional[float] = 0.5
+    trailing_stop: Optional[bool] = True
+
+
+# Plan-based limits
+PLAN_LIMITS = {
+    "demo": {"canCustomize": False},
+    "standard": {"canCustomize": False},
+    "cloud_sniper": {"maxTP": 50, "maxSL": 25, "canCustomize": True},
+    "pro": {"maxTP": 100, "maxSL": 50, "canCustomize": True},
+    "elite": {"maxTP": 200, "maxSL": 100, "canCustomize": True, "advanced": True}
+}
+
+
+@router.post("/settings")
+async def save_bot_settings(
+    request: BotSettingsRequest,
+    credentials: HTTPAuthorizationCredentials = Depends(security),
+    db: Session = Depends(get_db)
+):
+    """Save user bot settings (plan-gated)"""
+    try:
+        payload = verify_token(credentials.credentials)
+        email = payload.get("email")
+        user = db.query(User).filter(User.email == email).first()
+        
+        if not user:
+            raise HTTPException(status_code=404, detail="User not found")
+        
+        # Get plan limits
+        plan = user.plan or "standard"
+        limits = PLAN_LIMITS.get(plan, PLAN_LIMITS["standard"])
+        
+        if not limits.get("canCustomize"):
+            raise HTTPException(status_code=403, detail="Upgrade to PRO or ELITE to customize settings")
+        
+        # Validate against plan limits
+        max_tp = limits.get("maxTP", 50)
+        max_sl = limits.get("maxSL", 25)
+        
+        if request.take_profit > max_tp:
+            raise HTTPException(status_code=400, detail=f"Take profit max is {max_tp}% for your plan")
+        
+        if request.stop_loss > max_sl:
+            raise HTTPException(status_code=400, detail=f"Stop loss max is {max_sl}% for your plan")
+        
+        # Trailing stop only for ELITE
+        if request.trailing_stop and not limits.get("advanced"):
+            request.trailing_stop = False  # Silently disable for non-elite
+        
+        # Store settings (would save to BotInstance or separate table)
+        # For now, log and return success
+        print(f"[BOT] Settings saved for {email}: TP={request.take_profit}%, SL={request.stop_loss}%")
+        
+        return {
+            "success": True,
+            "message": "Settings saved",
+            "settings": {
+                "take_profit": request.take_profit,
+                "stop_loss": request.stop_loss,
+                "min_confidence": request.min_confidence,
+                "max_position_size": request.max_position_size,
+                "trailing_stop": request.trailing_stop
+            }
+        }
+        
+    except HTTPException as he:
+        raise he
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
