@@ -97,8 +97,32 @@ async def global_exception_handler(request: Request, exc: Exception):
     logger.error(f"Unhandled exception: {exc}")
     return JSONResponse(
         status_code=500,
-        content={"detail": "Internal server error"}
-    )
+# Static Files & Frontend Routes
+from fastapi.staticfiles import StaticFiles
+from fastapi.responses import FileResponse
+import os
+
+# Mount static directory for CSS/JS/Images
+app.mount("/static", StaticFiles(directory="app/static"), name="static")
+
+@app.get("/")
+async def serve_index():
+    return FileResponse("app/static/index.html")
+
+@app.get("/auth")
+@app.get("/login")
+@app.get("/signup")
+async def serve_auth():
+    return FileResponse("app/static/auth.html")
+
+@app.get("/dashboard")
+async def serve_dashboard():
+    return FileResponse("app/static/dashboard.html")
+
+@app.get("/admin")
+@app.get("/admin-panel")
+async def serve_admin():
+    return FileResponse("app/static/admin.html")
 
 
 if __name__ == "__main__":
