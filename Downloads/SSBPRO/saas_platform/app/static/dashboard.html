@@ -232,6 +232,117 @@
             background-clip: text;
             -webkit-text-fill-color: transparent;
         }
+
+        /* ========== MOBILE RESPONSIVE ========== */
+        @media (max-width: 768px) {
+            body {
+                grid-template-columns: 1fr;
+            }
+
+            .sidebar {
+                position: fixed;
+                left: -260px;
+                top: 0;
+                bottom: 0;
+                width: 240px;
+                z-index: 1000;
+                transition: left 0.3s ease;
+            }
+
+            .sidebar.open {
+                left: 0;
+            }
+
+            .main {
+                padding: 16px;
+                margin-left: 0;
+            }
+
+            .main header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 12px;
+            }
+
+            .grid-3 {
+                grid-template-columns: 1fr;
+            }
+
+            .grid-2 {
+                grid-template-columns: 1fr;
+            }
+
+            .card {
+                padding: 16px;
+            }
+
+            h1 {
+                font-size: 20px !important;
+            }
+
+            .btn {
+                padding: 10px 16px;
+                font-size: 12px;
+            }
+
+            /* Mobile menu toggle */
+            .mobile-menu-toggle {
+                display: block !important;
+                position: fixed;
+                top: 16px;
+                left: 16px;
+                z-index: 1001;
+                background: var(--card);
+                border: 1px solid rgba(55, 65, 81, 0.6);
+                color: var(--text);
+                padding: 10px 12px;
+                border-radius: 8px;
+                cursor: pointer;
+            }
+
+            /* Strategy cards mobile */
+            .strategies-grid {
+                grid-template-columns: 1fr !important;
+            }
+
+            /* Leaderboard mobile */
+            .leaderboard-row {
+                flex-direction: column;
+                gap: 8px;
+            }
+
+            /* Copy trading cards mobile */
+            .leader-cards {
+                grid-template-columns: 1fr !important;
+            }
+
+            /* Filter tabs mobile */
+            .strat-filters {
+                flex-wrap: wrap;
+            }
+
+            .strat-filter {
+                flex: 1;
+                min-width: 80px;
+                text-align: center;
+            }
+        }
+
+        /* Tablet adjustments */
+        @media (min-width: 769px) and (max-width: 1024px) {
+            .grid-3 {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .strategies-grid {
+                grid-template-columns: repeat(2, 1fr) !important;
+            }
+        }
+
+        /* Hide mobile toggle on desktop */
+        .mobile-menu-toggle {
+            display: none;
+        }
     </style>
 </head>
 
@@ -240,7 +351,10 @@
         <div style="color:var(--accent);">Connecting to Neural Cloud...</div>
     </div>
 
-    <div class="sidebar">
+    <!-- Mobile Menu Toggle -->
+    <button class="mobile-menu-toggle" onclick="toggleMobileMenu()">☰</button>
+
+    <div class="sidebar" id="sidebar">
         <div class="logo">SSB CLOUD</div>
         <a href="#" class="nav-item active" onclick="switchTab('dashboard', this)">Dashboard</a>
         <a href="#" class="nav-item" onclick="switchTab('wallet', this)">Wallet & RPC</a>
@@ -1328,6 +1442,11 @@
             } catch (e) {
                 alert('❌ Failed to share strategy');
             }
+        }
+
+        // Mobile menu toggle
+        function toggleMobileMenu() {
+            document.getElementById('sidebar').classList.toggle('open');
         }
 
         window.onload = init;

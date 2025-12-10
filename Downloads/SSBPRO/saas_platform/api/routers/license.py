@@ -232,7 +232,14 @@ async def issue_license(
     db: Session = Depends(get_db)
 ):
     """Issue a new license (admin only)"""
-    # TODO: Add admin check
+    # Verify admin role
+    try:
+        payload = verify_token(credentials.credentials)
+        role = payload.get("role", "")
+        if role not in ["admin", "super_admin"]:
+            raise HTTPException(status_code=403, detail="Admin access required")
+    except Exception:
+        raise HTTPException(status_code=401, detail="Invalid or expired token")
     
     key = generate_license_key(plan)
     expires = datetime.utcnow() + timedelta(days=30 * months)
