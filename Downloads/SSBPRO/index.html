@@ -1250,6 +1250,124 @@
             margin-top: 4px;
         }
 
+        /* Enterprise Premium Enhancements */
+        .glass-card {
+            background: rgba(15, 23, 42, 0.7);
+            backdrop-filter: blur(20px) saturate(180%);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37),
+                inset 0 1px 1px 0 rgba(255, 255, 255, 0.05);
+        }
+
+        .shimmer-text {
+            background: linear-gradient(90deg, #22d3ee 0%, #a855f7 50%, #22d3ee 100%);
+            background-size: 200% auto;
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+            animation: shimmer 3s linear infinite;
+        }
+
+        .glow-border {
+            position: relative;
+            border-radius: 16px;
+        }
+
+        .glow-border::before {
+            content: '';
+            position: absolute;
+            inset: -2px;
+            background: linear-gradient(45deg, #22d3ee, #a855f7, #f97316, #22d3ee);
+            border-radius: 16px;
+            z-index: -1;
+            background-size: 400%;
+            animation: shimmer 8s linear infinite;
+            opacity: 0.6;
+            filter: blur(8px);
+        }
+
+        .premium-cta {
+            position: relative;
+            padding: 16px 48px;
+            font-size: 16px;
+            font-weight: 700;
+            border-radius: 999px;
+            border: none;
+            background: linear-gradient(135deg, #22d3ee 0%, #a855f7 100%);
+            color: #000;
+            cursor: pointer;
+            overflow: hidden;
+            transition: all 0.3s;
+            box-shadow: 0 4px 15px rgba(34, 211, 238, 0.4),
+                0 10px 40px rgba(168, 85, 247, 0.3);
+        }
+
+        .premium-cta::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(135deg, transparent 0%, rgba(255, 255, 255, 0.3) 50%, transparent 100%);
+            transform: translateX(-100%);
+            transition: transform 0.6s;
+        }
+
+        .premium-cta:hover::before {
+            transform: translateX(100%);
+        }
+
+        .premium-cta:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(34, 211, 238, 0.6),
+                0 15px 50px rgba(168, 85, 247, 0.4);
+        }
+
+        /* Simulator Showcase */
+        .simulator-showcase {
+            margin: 60px auto;
+            padding: 60px 40px;
+            background: linear-gradient(135deg, rgba(34, 211, 238, 0.05) 0%, rgba(168, 85, 247, 0.05) 100%);
+            border-radius: 24px;
+            border: 1px solid rgba(34, 211, 238, 0.2);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .simulator-showcase::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -10%;
+            width: 500px;
+            height: 500px;
+            background: radial-gradient(circle, rgba(168, 85, 247, 0.15) 0%, transparent 70%);
+            border-radius: 50%;
+            pointer-events: none;
+        }
+
+        .live-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 16px;
+            background: rgba(34, 197, 94, 0.1);
+            border: 1px solid rgba(34, 197, 94, 0.3);
+            border-radius: 999px;
+            font-size: 12px;
+            font-weight: 600;
+            color: #22c55e;
+            margin-bottom: 20px;
+        }
+
+        .live-badge::before {
+            content: '';
+            width: 8px;
+            height: 8px;
+            background: #22c55e;
+            border-radius: 50%;
+            box-shadow: 0 0 12px #22c55e;
+            animation: pulse 2s infinite;
+        }
+
         /* Premium Tabs */
         .features-tabs {
             display: flex;
@@ -1361,10 +1479,189 @@
                 display: none;
             }
         }
+
+        /* Premium Button Ripple Effect */
+        .btn-primary,
+        .btn-outline,
+        .premium-cta {
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn-primary::after,
+        .btn-outline::after,
+        .premium-cta::after {
+            content: '';
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+            pointer-events: none;
+            background-image: radial-gradient(circle, rgba(255, 255, 255, 0.3) 10%, transparent 10.01%);
+            background-repeat: no-repeat;
+            background-position: 50%;
+            transform: scale(10, 10);
+            opacity: 0;
+            transition: transform 0.5s, opacity 0.8s;
+        }
+
+        .btn-primary:active::after,
+        .btn-outline:active::after,
+        .premium-cta:active::after {
+            transform: scale(0, 0);
+            opacity: 0.3;
+            transition: 0s;
+        }
+
+        /* Enhanced Card Hover Effects */
+        .price-card,
+        .feature-card,
+        .step-card,
+        .testimonial-card {
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .price-card:hover,
+        .feature-card:hover {
+            transform: translateY(-8px) scale(1.02);
+        }
+
+        /* Gradient Text Animation */
+        .gradient-text-animated {
+            background: linear-gradient(270deg, #22d3ee, #a855f7, #f97316, #22d3ee);
+            background-size: 300% 300%;
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+            animation: gradientShift 6s ease infinite;
+        }
+
+        @keyframes gradientShift {
+            0% {
+                background-position: 0% 50%;
+            }
+
+            50% {
+                background-position: 100% 50%;
+            }
+
+            100% {
+                background-position: 0% 50%;
+            }
+        }
+
+        /* Dropdown Navigation */
+        .nav-dropdown {
+            position: relative;
+            display: inline-block;
+        }
+
+        .nav-dropdown-content {
+            display: none;
+            position: absolute;
+            top: 100%;
+            left: 0;
+            min-width: 200px;
+            background: rgba(15, 23, 42, 0.98);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(34, 211, 238, 0.2);
+            border-radius: 12px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            padding: 12px 0;
+            animation: dropdownFade 0.3s ease;
+        }
+
+        .nav-dropdown:hover .nav-dropdown-content {
+            display: block;
+        }
+
+        .nav-dropdown-content a {
+            display: block;
+            padding: 10px 20px;
+            font-size: 13px;
+            color: var(--muted);
+            transition: all 0.2s;
+        }
+
+        .nav-dropdown-content a:hover {
+            background: rgba(34, 211, 238, 0.1);
+            color: var(--accent);
+            text-decoration: none;
+        }
+
+        @keyframes dropdownFade {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Scroll Progress Bar */
+        .scroll-progress {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 0%;
+            height: 3px;
+            background: linear-gradient(90deg, #22d3ee, #a855f7);
+            z-index: 9999;
+            transition: width 0.1s linear;
+        }
+
+        /* Floating Action Button */
+        .fab {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #22d3ee, #a855f7);
+            border: none;
+            cursor: pointer;
+            box-shadow: 0 4px 20px rgba(34, 211, 238, 0.4);
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            transition: all 0.3s;
+            animation: pulse-glow 3s ease-in-out infinite;
+        }
+
+        .fab:hover {
+            transform: scale(1.1);
+            box-shadow: 0 6px 30px rgba(34, 211, 238, 0.6);
+        }
+
+        @media (max-width: 768px) {
+            .fab {
+                bottom: 80px;
+                width: 50px;
+                height: 50px;
+                font-size: 20px;
+            }
+        }
     </style>
 </head>
 
 <body>
+    <!-- Scroll Progress Bar -->
+    <div class="scroll-progress" id="scrollProgress"></div>
+
+    <!-- Floating Action Button - Quick to top -->
+    <button class="fab" id="fabTop" onclick="window.scrollTo({top: 0, behavior: 'smooth'})" title="Back to Top"
+        style="display: none;">
+        ↑
+    </button>
+
     <div class="particles" id="particles"></div>
 
     <div class="wrapper">
@@ -1480,6 +1777,55 @@
                     </div>
                     <div class="hero-log" id="hero-log"></div>
                 </div>
+            </div>
+        </section>
+
+        <!-- 🧪 CLOUD DRY RUN SIMULATOR SHOWCASE -->
+        <section class="simulator-showcase glass-card glow-border">
+            <div style="position:relative; z-index:1; text-align:center;">
+                <div class="live-badge">
+                    LIVE DEMO AVAILABLE
+                </div>
+
+                <h2 style="font-size:48px; margin-bottom:16px; font-weight:900;">
+                    🧪 Cloud <span class="shimmer-text">Dry Run</span> Simulator
+                </h2>
+
+                <p style="font-size:18px; color:var(--muted); max-width:700px; margin:0 auto 32px; line-height:1.8;">
+                    Experience the bot's <strong style="color:#22d3ee;">AI-powered trading intelligence</strong> in
+                    real-time.
+                    Zero risk. Instant feedback. Watch it scan tokens, filter rugs, and execute perfect entries—all in a
+                    <strong style="color:#a855f7;">Matrix-style simulation</strong>.
+                </p>
+
+                <div
+                    style="display:grid; grid-template-columns: repeat(3, 1fr); gap:20px; max-width:800px; margin:0 auto 40px;">
+                    <div
+                        style="background:rgba(34,211,238,0.1); padding:20px; border-radius:12px; border:1px solid rgba(34,211,238,0.3);">
+                        <div style="font-size:32px; font-weight:900; color:#22d3ee; margin-bottom:4px;">50K+</div>
+                        <div style="font-size:12px; color:var(--muted);">Tokens Scanned/Minute</div>
+                    </div>
+                    <div
+                        style="background:rgba(168,85,247,0.1); padding:20px; border-radius:12px; border:1px solid rgba(168,85,247,0.3);">
+                        <div style="font-size:32px; font-weight:900; color:#a855f7; margin-bottom:4px;">78%</div>
+                        <div style="font-size:12px; color:var(--muted);">Simulated Win Rate</div>
+                    </div>
+                    <div
+                        style="background:rgba(34,197,94,0.1); padding:20px; border-radius:12px; border:1px solid rgba(34,197,94,0.3);">
+                        <div style="font-size:32px; font-weight:900; color:#22c55e; margin-bottom:4px;">24/7</div>
+                        <div style="font-size:12px; color:var(--muted);">Cloud Autonomy</div>
+                    </div>
+                </div>
+
+                <a href="dashboard.html" style="text-decoration:none;">
+                    <button class="premium-cta">
+                        ⚡ Launch Live Simulator →
+                    </button>
+                </a>
+
+                <p style="margin-top:16px; font-size:13px; color:var(--muted);">
+                    No signup required for demo • Full features unlocked in Simulator Mode
+                </p>
             </div>
         </section>
 
@@ -2662,6 +3008,29 @@
             trustBadges.forEach((badge, i) => {
                 badge.style.animation = `heroFloat ${3 + i * 0.5}s ease-in-out infinite`;
                 badge.style.animationDelay = `${i * 0.2}s`;
+            });
+
+            // Scroll Progress Bar and FAB
+            const scrollProgress = document.getElementById('scrollProgress');
+            const fabTop = document.getElementById('fabTop');
+
+            window.addEventListener('scroll', () => {
+                // Update scroll progress bar
+                const scrollTop = window.scrollY;
+                const docHeight = document.documentElement.scrollHeight - window.innerHeight;
+                const scrollPercent = (scrollTop / docHeight) * 100;
+                if (scrollProgress) {
+                    scrollProgress.style.width = scrollPercent + '%';
+                }
+
+                // Show/hide FAB based on scroll position
+                if (fabTop) {
+                    if (scrollTop > 400) {
+                        fabTop.style.display = 'flex';
+                    } else {
+                        fabTop.style.display = 'none';
+                    }
+                }
             });
         });
 
