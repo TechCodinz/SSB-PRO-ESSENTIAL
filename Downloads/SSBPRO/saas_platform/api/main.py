@@ -8,7 +8,7 @@ from fastapi.responses import JSONResponse
 import logging
 
 # Import routers
-from api.routers import auth, license, orders, user, bot
+from api.routers import auth, license, orders, user, bot, simulation, referral
 from api.middleware.rate_limit import RateLimitMiddleware
 from api.database import engine, Base
 from api.models import user as user_model, order as order_model, license as license_model
@@ -53,6 +53,8 @@ app.include_router(license.router, prefix="/v1/license", tags=["License"])
 app.include_router(orders.router, prefix="/v1/orders", tags=["Orders"])
 app.include_router(user.router, prefix="/v1/user", tags=["User"])
 app.include_router(bot.router, prefix="/v1/bot", tags=["Bot"])
+app.include_router(simulation.router, prefix="/v1/simulation", tags=["Simulation"])
+app.include_router(referral.router, prefix="/v1/referral", tags=["Referral"])
 
 
 @app.get("/")

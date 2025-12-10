@@ -25,6 +25,7 @@ class SignupRequest(BaseModel):
     email: EmailStr
     password: str
     plan: Optional[str] = "cloud_sniper"
+    ref_code: Optional[str] = None  # Referral code from URL
 
 
 class LoginRequest(BaseModel):
@@ -63,7 +64,8 @@ async def signup(request: SignupRequest, db: Session = Depends(get_db)):
         email=request.email,
         password_hash=hash_password(request.password),
         plan=request.plan,
-        verified=False
+        verified=False,
+        referred_by=request.ref_code  # Track referral!
     )
     
     db.add(new_user)
@@ -80,6 +82,7 @@ async def signup(request: SignupRequest, db: Session = Depends(get_db)):
     return {
         "success": True,
         "user_id": new_user.id,
+        "referral_code": new_user.referral_code,  # Return their new ref code
         "verification_sent": True,
         "message": "Account created. Please verify your email."
     }

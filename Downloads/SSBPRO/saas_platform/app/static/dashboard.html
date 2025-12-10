@@ -243,7 +243,8 @@
         <div class="logo">SSB CLOUD</div>
         <a href="#" class="nav-item active" onclick="switchTab('dashboard', this)">Dashboard</a>
         <a href="#" class="nav-item" onclick="switchTab('wallet', this)">Wallet & RPC</a>
-        <a href="#" class="nav-item">History</a>
+        <a href="#" class="nav-item" onclick="switchTab('affiliate', this)">💸 Affiliate</a>
+        <a href="#" class="nav-item" onclick="switchTab('leaderboard', this)">🏆 Leaderboard</a>
         <a href="#" class="nav-item" onclick="logout()">Logout</a>
     </div>
 
@@ -366,6 +367,89 @@
                 <button class="btn" onclick="saveConfig()" style="background:#334155; color:white;">UPDATE RPC</button>
             </div>
         </div>
+
+        <!-- Affiliate View (Viral Engine!) -->
+        <div id="view-affiliate" style="display:none; max-width: 900px;">
+            <header>
+                <div>
+                    <h1 style="margin:0; font-size:24px;">💸 Affiliate Program</h1>
+                    <div style="font-size:12px; color:var(--muted); margin-top:4px;">Earn 15% recurring commission on
+                        every referral</div>
+                </div>
+            </header>
+
+            <!-- Referral Link Card -->
+            <div class="card"
+                style="margin-bottom: 24px; border-color: rgba(168,85,247,0.4); background: linear-gradient(135deg, rgba(168,85,247,0.1), rgba(34,211,238,0.05));">
+                <h3 style="margin-top:0; color:#a855f7;">🔗 Your Referral Link</h3>
+                <div style="display:flex; gap:12px; align-items:center;">
+                    <input type="text" id="ref-link" readonly
+                        style="flex:1; padding:14px; background:rgba(0,0,0,0.4); border:1px solid #a855f7; color:white; border-radius:8px; font-family:monospace; font-size:13px;">
+                    <button class="btn btn-primary" onclick="copyRefLink()" style="padding:14px 20px;">📋 COPY</button>
+                </div>
+                <p style="font-size:12px; color:var(--muted); margin-top:12px;">Share this link on Twitter, Discord,
+                    Telegram - every signup earns you 15% of their payments FOREVER!</p>
+            </div>
+
+            <!-- Stats Grid -->
+            <div class="grid-3" style="margin-bottom:24px;">
+                <div class="card" style="text-align:center;">
+                    <div style="font-size:36px; font-weight:800; color:#a855f7;" id="ref-total">0</div>
+                    <div style="font-size:12px; color:var(--muted);">TOTAL REFERRALS</div>
+                </div>
+                <div class="card" style="text-align:center;">
+                    <div style="font-size:36px; font-weight:800; color:#4ade80;" id="ref-earnings">$0</div>
+                    <div style="font-size:12px; color:var(--muted);">LIFETIME EARNINGS</div>
+                </div>
+                <div class="card" style="text-align:center;">
+                    <div style="font-size:36px; font-weight:800; color:#22d3ee;" id="ref-pending">$0</div>
+                    <div style="font-size:12px; color:var(--muted);">PENDING PAYOUT</div>
+                </div>
+            </div>
+
+            <!-- Claim Button -->
+            <div class="card">
+                <div style="display:flex; justify-content:space-between; align-items:center;">
+                    <div>
+                        <h3 style="margin:0;">Request Payout</h3>
+                        <p style="font-size:12px; color:var(--muted); margin:4px 0 0;">Minimum $50 required. Paid in
+                            USDT within 48 hours.</p>
+                    </div>
+                    <button class="btn btn-primary" onclick="claimEarnings()" style="padding:12px 24px;">💰 CLAIM
+                        NOW</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Leaderboard View (FOMO Engine!) -->
+        <div id="view-leaderboard" style="display:none; max-width: 900px;">
+            <header>
+                <div>
+                    <h1 style="margin:0; font-size:24px;">🏆 Global Leaderboard</h1>
+                    <div style="font-size:12px; color:var(--muted); margin-top:4px;">Top performers this month - Can you
+                        beat them?</div>
+                </div>
+            </header>
+
+            <div class="card">
+                <table style="width:100%; border-collapse:collapse; font-size:13px;">
+                    <thead>
+                        <tr style="border-bottom:1px solid rgba(255,255,255,0.1);">
+                            <th style="padding:12px; text-align:left; color:var(--muted);">RANK</th>
+                            <th style="padding:12px; text-align:left; color:var(--muted);">TRADER</th>
+                            <th style="padding:12px; text-align:right; color:var(--muted);">TOTAL PnL</th>
+                            <th style="padding:12px; text-align:right; color:var(--muted);">WIN RATE</th>
+                            <th style="padding:12px; text-align:center; color:var(--muted);">BADGES</th>
+                        </tr>
+                    </thead>
+                    <tbody id="leaderboard-body">
+                        <tr>
+                            <td colspan="5" style="padding:20px; text-align:center; color:var(--muted);">Loading...</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
     </div>
 
     <script>
@@ -483,6 +567,8 @@
             // Hide all views
             document.getElementById('view-dashboard').style.display = 'none';
             document.getElementById('view-wallet').style.display = 'none';
+            document.getElementById('view-affiliate').style.display = 'none';
+            document.getElementById('view-leaderboard').style.display = 'none';
 
             // Show selected
             document.getElementById('view-' + viewId).style.display = 'block';
@@ -490,6 +576,10 @@
             // Update nav
             document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
             link.classList.add('active');
+
+            // Load data for specific views
+            if (viewId === 'affiliate') loadReferralStats();
+            if (viewId === 'leaderboard') loadLeaderboard();
         }
 
         // Configuration
@@ -537,6 +627,78 @@
                 console.error(e);
                 statusEl.innerHTML = '❌ Connection Error';
                 statusEl.style.color = '#f87171';
+            }
+        }
+
+        // ========== REFERRAL SYSTEM ==========
+        async function loadReferralStats() {
+            const token = localStorage.getItem('ssb_token');
+            try {
+                const res = await fetch(`${API}/referral/stats`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                const data = await res.json();
+
+                document.getElementById('ref-link').value = data.referral_link;
+                document.getElementById('ref-total').innerText = data.total_referrals;
+                document.getElementById('ref-earnings').innerText = '$' + data.total_earnings.toFixed(2);
+                document.getElementById('ref-pending').innerText = '$' + data.pending_earnings.toFixed(2);
+            } catch (e) {
+                console.error('Failed to load referral stats', e);
+            }
+        }
+
+        function copyRefLink() {
+            const link = document.getElementById('ref-link');
+            link.select();
+            document.execCommand('copy');
+            alert('🔗 Referral link copied! Share it to earn 15%!');
+        }
+
+        async function claimEarnings() {
+            const token = localStorage.getItem('ssb_token');
+            try {
+                const res = await fetch(`${API}/referral/claim`, {
+                    method: 'POST',
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                const data = await res.json();
+
+                if (data.success) {
+                    alert('💰 ' + data.message);
+                    loadReferralStats(); // Refresh
+                } else {
+                    alert('❌ ' + data.detail);
+                }
+            } catch (e) {
+                alert('❌ Failed to claim earnings');
+            }
+        }
+
+        // ========== LEADERBOARD ==========
+        async function loadLeaderboard() {
+            try {
+                const res = await fetch(`${API}/referral/leaderboard`);
+                const data = await res.json();
+
+                const tbody = document.getElementById('leaderboard-body');
+                tbody.innerHTML = '';
+
+                data.leaderboard.forEach(entry => {
+                    const pnlColor = entry.total_pnl >= 0 ? '#4ade80' : '#f87171';
+                    const row = `
+                        <tr style="border-bottom:1px solid rgba(255,255,255,0.05);">
+                            <td style="padding:12px; font-weight:700;">${entry.rank <= 3 ? ['🥇', '🥈', '🥉'][entry.rank - 1] : '#' + entry.rank}</td>
+                            <td style="padding:12px;">${entry.username}</td>
+                            <td style="padding:12px; text-align:right; font-weight:700; color:${pnlColor};">${entry.total_pnl >= 0 ? '+' : ''}$${entry.total_pnl.toFixed(2)}</td>
+                            <td style="padding:12px; text-align:right;">${entry.win_rate.toFixed(1)}%</td>
+                            <td style="padding:12px; text-align:center;">${entry.badges.join(' ')}</td>
+                        </tr>
+                    `;
+                    tbody.innerHTML += row;
+                });
+            } catch (e) {
+                console.error('Failed to load leaderboard', e);
             }
         }
 

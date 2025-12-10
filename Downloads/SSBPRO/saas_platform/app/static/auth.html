@@ -14,40 +14,82 @@
             --text: #f9fafb;
             --muted: #9ca3af;
             --danger: #f97373;
+            --glow-cyan: rgba(34, 211, 238, 0.4);
+            --glow-purple: rgba(168, 85, 247, 0.4);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
         }
 
         body {
-            font-family: 'Inter', system-ui, sans-serif;
+            font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
             background: radial-gradient(ellipse at top center, #111827 0%, #020617 50%, #000 100%);
             color: var(--text);
-            height: 100vh;
+            min-height: 100vh;
             display: flex;
+            flex-direction: column;
             align-items: center;
-            justify-content: center;
-            margin: 0;
+            justify-content: flex-start;
+            overflow-x: hidden;
+        }
+
+        a {
+            color: var(--accent);
+            text-decoration: none;
+            transition: all 0.3s;
+        }
+
+        a:hover {
+            color: #67e8f9;
+            text-decoration: underline;
+        }
+
+        header.auth-header {
+            width: 100%;
+            padding: 16px 32px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: rgba(15, 23, 42, 0.8);
+            backdrop-filter: blur(12px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+
+        .logo {
+            font-size: 20px;
+            font-weight: 800;
+            background: linear-gradient(90deg, var(--accent), var(--accent2));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
         }
 
         .auth-container {
             width: 100%;
-            max-width: 400px;
-            background: var(--card);
-            border: 1px solid rgba(55, 65, 81, 0.8);
+            max-width: 420px;
+            margin-top: 40px;
+            background: rgba(15, 23, 42, 0.6);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
             border-radius: 16px;
             padding: 32px;
-            box-shadow: 0 0 50px rgba(0, 0, 0, 0.5);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.6);
+            animation: fadeInUp 0.7s ease-out forwards;
+            opacity: 0;
         }
 
-        .brand {
+        .auth-container h1 {
+            font-size: 24px;
             text-align: center;
             margin-bottom: 24px;
-        }
-
-        .brand h1 {
-            font-size: 24px;
-            background: linear-gradient(90deg, #22d3ee, #a855f7);
+            background: linear-gradient(90deg, var(--accent), var(--accent2));
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
-            margin: 0;
         }
 
         .form-group {
@@ -69,14 +111,13 @@
             border-radius: 8px;
             color: var(--text);
             font-size: 14px;
-            box-sizing: border-box;
             transition: all 0.3s;
         }
 
         input:focus {
             outline: none;
             border-color: var(--accent);
-            box-shadow: 0 0 10px rgba(34, 211, 238, 0.2);
+            box-shadow: 0 0 10px var(--glow-cyan);
         }
 
         button {
@@ -84,7 +125,7 @@
             padding: 12px;
             border-radius: 8px;
             border: none;
-            background: linear-gradient(135deg, #22d3ee, #a855f7);
+            background: linear-gradient(135deg, var(--accent), var(--accent2));
             color: #000;
             font-weight: 700;
             cursor: pointer;
@@ -94,7 +135,8 @@
 
         button:hover {
             opacity: 0.9;
-            transform: translateY(-1px);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 20px var(--glow-cyan);
         }
 
         .toggle-text {
@@ -111,20 +153,39 @@
         }
 
         #error-msg {
-            color: var(--danger);
+            min-height: 18px;
+            margin-bottom: 12px;
             font-size: 12px;
             text-align: center;
-            margin-bottom: 12px;
-            min-height: 18px;
         }
 
         .hidden {
             display: none;
         }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
     </style>
 </head>
 
 <body>
+    <header class="auth-header">
+        <div class="logo">SSB PRO CLOUD</div>
+        <nav>
+            <a href="#">Features</a>
+            <a href="#">Pricing</a>
+            <a href="#">Contact</a>
+        </nav>
+    </header>
     <div class="auth-container">
         <div class="brand">
             <h1>SSB PRO CLOUD</h1>
