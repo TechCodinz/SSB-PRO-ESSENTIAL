@@ -264,18 +264,40 @@ class BotWorkerEngine:
                                 else:
                                     # LIVE MODE
                                     self.stats["live_buys"] += 1
-                                    await self.log(
-                                        f"🟢 LIVE BUY: {opportunity.position_size:.3f} SOL → {mint[:8]}",
-                                        "success"
-                                    )
-                                    await self.log(
-                                        f"   🎯 TP: ${opportunity.target_tp:.8f} | 🛑 SL: ${opportunity.target_sl:.8f}",
-                                        "info"
-                                    )
                                     
-                                    # TODO: Execute actual Solana transaction here
-                                    # This would call the Solana SDK to buy the token
-                                    
+                                    # Execute Swap
+                                    try:
+                                        tx_sig = await self.execute_solana_swap(
+                                            mint=mint,
+                                            amount_sol=opportunity.position_size,
+                                            slippage_bps=int(self.config.get("slippage", 1.0) * 100)
+                                        )
+                                        
+                                        if tx_sig:
+                                            await self.log(
+                                                f"🟢 LIVE BUY EXECUTED: {opportunity.position_size:.3f} SOL → {mint[:8]}",
+                                                "success"
+                                            )
+                                            await self.log(
+                                                f"   🔗 TX: https://solscan.io/tx/{tx_sig}",
+                                                "info"
+                                            )
+                                            
+                                            # Track position
+                                            self.active_positions[mint] = {
+                                                "entry_price": opportunity.entry_price,
+                                                "position_size": opportunity.position_size,
+                                                "target_tp": opportunity.target_tp,
+                                                "target_sl": opportunity.target_sl,
+                                                "tx_sig": tx_sig,
+                                                "entry_time": datetime.utcnow()
+                                            }
+                                        else:
+                                            await self.log("❌ Swap failed (no signature returned)", "danger")
+                                            
+                                    except Exception as swap_err:
+                                        await self.log(f"❌ Swap Exec Error: {str(swap_err)}", "danger")
+
                             except Exception as e:
                                 await self.log(f"Error processing token: {e}", "danger")
                                 
@@ -293,11 +315,116 @@ class BotWorkerEngine:
         finally:
             self.running = False
             await self.update_status(BotStatus.STOPPED)
+            # Log final stats...
+
+    # ==================== TRADING LOGIC ====================
+    
+    def _decrypt_key(self, token: str) -> str:
+        """Decrypt private key using system secret"""
+        import hashlib
+        import base64
+        from cryptography.fernet import Fernet
+        
+        key = hashlib.sha256(settings.SECRET_KEY.encode()).digest()
+        cipher = Fernet(base64.urlsafe_b64encode(key))
+        return cipher.decrypt(token.encode()).decode()
+
+    async def execute_solana_swap(self, mint: str, amount_sol: float, slippage_bps: int = 100) -> Optional[str]:
+        """
+        Execute a swap on Solana using Jupiter Aggregator V6 API.
+        1. Get Quote
+        2. Get Swap Transaction
+        3. Sign and Send
+        """
+        import httpx
+        import base64
+        import base58
+        from solders.keypair import Keypair
+        from solders.transaction import VersionedTransaction
+        from solana.rpc.async_api import AsyncClient
+        from solana.rpc.commitment import Confirmed
+        from solders.compute_budget import set_compute_unit_limit, set_compute_unit_price
+        
+        try:
+            # 1. Decrypt Wallet
+            encrypted_key = self.config.get("private_key")
+            if not encrypted_key:
+                await self.log("❌ No private key configured", "danger")
+                return None
             
-            # Log final stats
-            win_rate = self.stats["win_count"] / max(self.stats["win_count"] + self.stats["loss_count"], 1) * 100
-            await self.log(f"📊 Session Stats:", "info")
-            await self.log(f"   Tokens Scanned: {self.stats['tokens_seen']}", "info")
+            private_key_base58 = self._decrypt_key(encrypted_key)
+            keypair = Keypair.from_base58_string(private_key_base58)
+            wallet_pubkey = str(keypair.pubkey())
+            
+            # 2. Setup RPC
+            rpc_url = self.config.get("rpc_url") or settings.RPC_URL or "https://api.mainnet-beta.solana.com"
+            async_client = AsyncClient(rpc_url)
+            
+            # 3. Get Quote from Jupiter
+            # Input is SOL (So11111111111111111111111111111111111111112)
+            SOL_MINT = "So11111111111111111111111111111111111111112"
+            amount_lamports = int(amount_sol * 1_000_000_000)
+            
+            quote_url = f"https://quote-api.jup.ag/v6/quote?inputMint={SOL_MINT}&outputMint={mint}&amount={amount_lamports}&slippageBps={slippage_bps}"
+            
+            async with httpx.AsyncClient() as client:
+                quote_res = await client.get(quote_url)
+                if quote_res.status_code != 200:
+                    await self.log(f"❌ Jupiter Quote Failed: {quote_res.text}", "danger")
+                    return None
+                
+                quote_data = quote_res.json()
+                
+                # 4. Get Swap Transaction
+                swap_payload = {
+                    "quoteResponse": quote_data,
+                    "userPublicKey": wallet_pubkey,
+                    "wrapAndUnwrapSol": True,
+                    # Optimize for speed with dynamic priority fees handled by Jupiter or manually
+                    "dynamicComputeUnitLimit": True, 
+                    "prioritizationFeeLamports": "auto" 
+                }
+                
+                swap_res = await client.post("https://quote-api.jup.ag/v6/swap", json=swap_payload)
+                if swap_res.status_code != 200:
+                    await self.log(f"❌ Jupiter Swap Gen Failed: {swap_res.text}", "danger")
+                    return None
+                
+                swap_data = swap_res.json()
+                swap_transaction_buf = swap_data["swapTransaction"]
+                
+                # 5. Sign and Send
+                raw_tx = base64.b64decode(swap_transaction_buf)
+                tx = VersionedTransaction.from_bytes(raw_tx)
+                
+                # Sign
+                signature = keypair.sign_message(tx.message.to_bytes_versioned(tx.message))
+                signed_tx = VersionedTransaction.populate(tx.message, [signature])
+                
+                # Send
+                opts = settings.TX_OPTS if hasattr(settings, 'TX_OPTS') else None
+                # Use basic send if no special opts
+                
+                # We use solders to send, or AsyncClient
+                # AsyncClient.send_transaction expects a VersionedTransaction object or bytes
+                
+                # Note: solana-py 0.30+ changes how send_transaction works.
+                # We send the serialized byte content.
+                
+                # Using httpx to send to RPC directly for maximum control if AsyncClient has issues, 
+                # but let's try AsyncClient first as it handles encoding.
+                
+                resp = await async_client.send_transaction(
+                    signed_tx, 
+                    opts=None
+                )
+                
+                await async_client.close()
+                return str(resp.value)
+                
+        except Exception as e:
+            await self.log(f"❌ FATAL SWAP ERROR: {str(e)}", "danger")
+            return None
             await self.log(f"   Opportunities Found: {self.stats['tokens_passed']}", "info")
             await self.log(f"   Trades: {self.stats['dry_run_buys'] + self.stats['live_buys']}", "info")
             await self.log(f"   Win Rate: {win_rate:.1f}%", "info")

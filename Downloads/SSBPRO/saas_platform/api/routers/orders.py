@@ -144,7 +144,8 @@ async def payment_webhook(payload: WebhookPayload, background_tasks: BackgroundT
         if commission:
             print(f"[REFERRAL] Credited ${commission:.2f} to referrer of {order.email}")
     
-    # Send email with license (TODO: implement email service)
+    # Log email request (Email service to be configured in Phase 8)
+    print(f"[EMAIL] To: {order.email} | Subject: License Activation | Key: {license_key} | Plan: {order.plan}")
     # background_tasks.add_task(send_license_email, order.email, license_key, order.plan)
     
     return {
