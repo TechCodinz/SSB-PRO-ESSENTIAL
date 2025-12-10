@@ -62,6 +62,20 @@ app.include_router(referral.router, prefix="/v1/referral", tags=["Referral"])
 app.include_router(copy_trading.router, prefix="/v1/copy", tags=["Copy Trading"])
 app.include_router(strategies.router, prefix="/v1/strategies", tags=["Strategy Sharing"])
 
+# Admin router (protected)
+from api.routers import admin
+app.include_router(admin.router, prefix="/v1/admin", tags=["Admin"])
+
+
+# Global error handler for crash protection
+@app.exception_handler(Exception)
+async def global_exception_handler(request, exc):
+    logger.error(f"Unhandled error: {exc}")
+    return JSONResponse(
+        status_code=500,
+        content={"error": "Internal server error", "message": str(exc) if app.debug else "An error occurred"}
+    )
+
 
 @app.get("/")
 async def root():
