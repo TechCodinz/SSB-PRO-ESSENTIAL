@@ -244,6 +244,7 @@
         <div class="logo">SSB CLOUD</div>
         <a href="#" class="nav-item active" onclick="switchTab('dashboard', this)">Dashboard</a>
         <a href="#" class="nav-item" onclick="switchTab('wallet', this)">Wallet & RPC</a>
+        <a href="#" class="nav-item" onclick="switchTab('strategies', this)">🧠 Strategies</a>
         <a href="#" class="nav-item" onclick="switchTab('affiliate', this)">💸 Affiliate</a>
         <a href="#" class="nav-item" onclick="switchTab('leaderboard', this)">🏆 Leaderboard</a>
         <a href="#" class="nav-item" onclick="switchTab('copytrading', this)">🔄 Copy Trading</a>
@@ -488,7 +489,215 @@
                 <div style="padding:20px; text-align:center; color:var(--muted);">You're not copying anyone yet.</div>
             </div>
         </div>
+
+        <!-- Strategy Marketplace View -->
+        <div id="view-strategies" style="display:none; max-width: 1000px;">
+            <header>
+                <div>
+                    <h1 style="margin:0; font-size:24px;">🧠 Strategy Marketplace</h1>
+                    <div style="font-size:12px; color:var(--muted); margin-top:4px;">Share & discover profitable trading
+                        configs</div>
+                </div>
+                <button class="btn btn-primary" onclick="showShareModal()" style="padding:10px 20px;">📤 SHARE MY
+                    STRATEGY</button>
+            </header>
+
+            <!-- Profit Tracker Widget -->
+            <div class="card" id="profit-tracker"
+                style="margin-bottom:24px; background: linear-gradient(135deg, rgba(74,222,128,0.15), rgba(34,211,238,0.08)); border:1px solid rgba(74,222,128,0.3); position:relative; overflow:hidden;">
+                <div style="position:absolute; top:0; left:0; height:100%; background: linear-gradient(90deg, #4ade80, #22d3ee); opacity:0.1; transition: width 0.5s;"
+                    id="profit-bar"></div>
+                <div style="position:relative; z-index:1;">
+                    <div style="display:flex; justify-content:space-between; align-items:center;">
+                        <div>
+                            <div
+                                style="font-size:11px; color:var(--muted); text-transform:uppercase; letter-spacing:1px;">
+                                Monthly Progress</div>
+                            <div style="font-size:28px; font-weight:800; margin-top:4px;" id="profit-amount">$0</div>
+                        </div>
+                        <div style="text-align:right;">
+                            <div style="font-size:11px; color:var(--muted);">Subscription Cost</div>
+                            <div style="font-size:18px; font-weight:600;" id="sub-cost">$99</div>
+                        </div>
+                    </div>
+                    <div style="margin-top:16px; font-size:13px;" id="profit-message">Loading...</div>
+                </div>
+            </div>
+
+            <!-- Filter Tabs -->
+            <div style="display:flex; gap:8px; margin-bottom:20px; flex-wrap:wrap;">
+                <button class="strat-filter active" onclick="filterStrategies('pnl', this)">🔥 Top PnL</button>
+                <button class="strat-filter" onclick="filterStrategies('upvotes', this)">👍 Most Liked</button>
+                <button class="strat-filter" onclick="filterStrategies('downloads', this)">⬇️ Most Used</button>
+                <button class="strat-filter" onclick="filterStrategies('new', this)">✨ Newest</button>
+            </div>
+
+            <!-- Strategy Grid -->
+            <div id="strategies-grid"
+                style="display:grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap:16px;">
+                <div class="card" style="padding:30px; text-align:center; color:var(--muted);">Loading strategies...
+                </div>
+            </div>
+        </div>
+
+        <!-- Share Strategy Modal -->
+        <div id="share-modal"
+            style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.8); z-index:1000; align-items:center; justify-content:center;">
+            <div class="card" style="width:90%; max-width:500px; padding:24px;">
+                <h2 style="margin-top:0;">📤 Share Your Strategy</h2>
+                <p style="color:var(--muted); font-size:13px;">Help others profit! Share your config settings.</p>
+
+                <div style="margin-bottom:16px;">
+                    <label style="font-size:12px; color:var(--muted); display:block; margin-bottom:6px;">Strategy
+                        Name</label>
+                    <input type="text" id="strat-name" placeholder="e.g. Diamond Hands Sniper"
+                        style="width:100%; padding:10px; background:rgba(0,0,0,0.3); border:1px solid #374151; color:white; border-radius:6px;">
+                </div>
+
+                <div style="margin-bottom:16px;">
+                    <label
+                        style="font-size:12px; color:var(--muted); display:block; margin-bottom:6px;">Description</label>
+                    <textarea id="strat-desc" placeholder="Describe your strategy..." rows="3"
+                        style="width:100%; padding:10px; background:rgba(0,0,0,0.3); border:1px solid #374151; color:white; border-radius:6px; resize:none;"></textarea>
+                </div>
+
+                <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-bottom:16px;">
+                    <div>
+                        <label style="font-size:12px; color:var(--muted); display:block; margin-bottom:6px;">Risk
+                            Level</label>
+                        <select id="strat-risk"
+                            style="width:100%; padding:10px; background:rgba(0,0,0,0.3); border:1px solid #374151; color:white; border-radius:6px;">
+                            <option value="low">🟢 Low Risk</option>
+                            <option value="medium" selected>🟡 Medium</option>
+                            <option value="high">🟠 High</option>
+                            <option value="degen">🔴 DEGEN</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label style="font-size:12px; color:var(--muted); display:block; margin-bottom:6px;">Min
+                            Confidence</label>
+                        <input type="number" id="strat-conf" value="75" min="50" max="100"
+                            style="width:100%; padding:10px; background:rgba(0,0,0,0.3); border:1px solid #374151; color:white; border-radius:6px;">
+                    </div>
+                </div>
+
+                <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:12px; margin-bottom:20px;">
+                    <div>
+                        <label style="font-size:12px; color:var(--muted); display:block; margin-bottom:6px;">Take Profit
+                            %</label>
+                        <input type="number" id="strat-tp" value="30"
+                            style="width:100%; padding:10px; background:rgba(0,0,0,0.3); border:1px solid #374151; color:white; border-radius:6px;">
+                    </div>
+                    <div>
+                        <label style="font-size:12px; color:var(--muted); display:block; margin-bottom:6px;">Stop Loss
+                            %</label>
+                        <input type="number" id="strat-sl" value="15"
+                            style="width:100%; padding:10px; background:rgba(0,0,0,0.3); border:1px solid #374151; color:white; border-radius:6px;">
+                    </div>
+                    <div>
+                        <label style="font-size:12px; color:var(--muted); display:block; margin-bottom:6px;">Max Size
+                            (SOL)</label>
+                        <input type="number" id="strat-size" value="0.5" step="0.1"
+                            style="width:100%; padding:10px; background:rgba(0,0,0,0.3); border:1px solid #374151; color:white; border-radius:6px;">
+                    </div>
+                </div>
+
+                <div style="display:flex; gap:12px;">
+                    <button class="btn" onclick="hideShareModal()" style="flex:1; background:#374151;">Cancel</button>
+                    <button class="btn btn-primary" onclick="submitStrategy()" style="flex:2;">🚀 SHARE WITH
+                        COMMUNITY</button>
+                </div>
+            </div>
+        </div>
     </div>
+
+    <style>
+        .strat-filter {
+            padding: 8px 16px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: var(--muted);
+            border-radius: 20px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .strat-filter:hover,
+        .strat-filter.active {
+            background: rgba(34, 211, 238, 0.2);
+            border-color: var(--accent);
+            color: var(--accent);
+        }
+
+        .strategy-card {
+            position: relative;
+            overflow: hidden;
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+
+        .strategy-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 12px 40px rgba(34, 211, 238, 0.15);
+        }
+
+        .strategy-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, #22d3ee, #a855f7);
+        }
+
+        .risk-badge {
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 10px;
+            font-weight: 600;
+        }
+
+        .risk-low {
+            background: rgba(74, 222, 128, 0.2);
+            color: #4ade80;
+        }
+
+        .risk-medium {
+            background: rgba(250, 204, 21, 0.2);
+            color: #facc15;
+        }
+
+        .risk-high {
+            background: rgba(251, 146, 60, 0.2);
+            color: #fb923c;
+        }
+
+        .risk-degen {
+            background: rgba(248, 113, 113, 0.2);
+            color: #f87171;
+        }
+
+        @keyframes shimmer {
+            0% {
+                background-position: -200% 0;
+            }
+
+            100% {
+                background-position: 200% 0;
+            }
+        }
+
+        .featured-badge {
+            background: linear-gradient(90deg, #fbbf24, #f59e0b, #fbbf24);
+            background-size: 200% auto;
+            animation: shimmer 2s linear infinite;
+            color: #000;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 10px;
+            font-weight: 700;
+        }
+    </style>
 
     <script>
         const API = "https://api.ssbpro.dev/v1";
@@ -608,6 +817,7 @@
             document.getElementById('view-affiliate').style.display = 'none';
             document.getElementById('view-leaderboard').style.display = 'none';
             document.getElementById('view-copytrading').style.display = 'none';
+            document.getElementById('view-strategies').style.display = 'none';
 
             // Show selected
             document.getElementById('view-' + viewId).style.display = 'block';
@@ -620,6 +830,7 @@
             if (viewId === 'affiliate') loadReferralStats();
             if (viewId === 'leaderboard') loadLeaderboard();
             if (viewId === 'copytrading') loadCopyTrading();
+            if (viewId === 'strategies') loadStrategies();
         }
 
         // Configuration
@@ -842,6 +1053,172 @@
                 `).join('');
             } catch (e) {
                 console.error('Failed to load my copies', e);
+            }
+        }
+
+        // ========== STRATEGY MARKETPLACE ==========
+        let currentStratSort = 'pnl';
+
+        async function loadStrategies() {
+            await loadProfitTracker();
+            await loadStrategyGrid(currentStratSort);
+        }
+
+        async function loadProfitTracker() {
+            const token = localStorage.getItem('ssb_token');
+            try {
+                const res = await fetch(`${API}/strategies/profit-tracker`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                const data = await res.json();
+
+                document.getElementById('profit-amount').innerText = `$${data.total_income.toFixed(0)}`;
+                document.getElementById('sub-cost').innerText = `$${data.subscription_cost}`;
+                document.getElementById('profit-message').innerHTML = data.covers_subscription
+                    ? `🎉 <span style="color:#4ade80;">You've covered your subscription!</span> Surplus: <strong>$${data.surplus.toFixed(0)}</strong>`
+                    : `📈 ${data.message}`;
+
+                // Animate bar
+                const percent = Math.min(100, (data.total_income / data.subscription_cost) * 100);
+                document.getElementById('profit-bar').style.width = percent + '%';
+            } catch (e) {
+                console.error('Failed to load profit tracker', e);
+            }
+        }
+
+        async function loadStrategyGrid(sortBy) {
+            try {
+                const res = await fetch(`${API}/strategies/browse?sort_by=${sortBy}`);
+                const data = await res.json();
+
+                const grid = document.getElementById('strategies-grid');
+
+                if (data.strategies.length === 0) {
+                    grid.innerHTML = '<div class="card" style="padding:40px; text-align:center; color:var(--muted);">No strategies shared yet. Be the first! 🚀</div>';
+                    return;
+                }
+
+                grid.innerHTML = data.strategies.map(s => {
+                    const riskClass = `risk-${s.risk_level}`;
+                    const pnlColor = s.total_pnl >= 0 ? '#4ade80' : '#f87171';
+                    return `
+                        <div class="card strategy-card" style="padding:16px;">
+                            <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:12px;">
+                                <div>
+                                    <div style="font-weight:700; font-size:15px;">${s.name}</div>
+                                    <div style="font-size:11px; color:var(--muted);">by ${s.author}</div>
+                                </div>
+                                <span class="risk-badge ${riskClass}">${s.risk_level.toUpperCase()}</span>
+                            </div>
+                            <p style="font-size:12px; color:var(--muted); margin:0 0 16px; line-height:1.4;">${s.description.slice(0, 80)}...</p>
+                            <div style="display:grid; grid-template-columns:repeat(3,1fr); gap:8px; text-align:center; margin-bottom:16px;">
+                                <div>
+                                    <div style="font-size:11px; color:var(--muted);">PnL</div>
+                                    <div style="font-weight:700; color:${pnlColor};">${s.total_pnl >= 0 ? '+' : ''}$${s.total_pnl.toFixed(0)}</div>
+                                </div>
+                                <div>
+                                    <div style="font-size:11px; color:var(--muted);">Win %</div>
+                                    <div style="font-weight:700;">${s.win_rate.toFixed(0)}%</div>
+                                </div>
+                                <div>
+                                    <div style="font-size:11px; color:var(--muted);">TP/SL</div>
+                                    <div style="font-weight:700;">${s.take_profit}/${s.stop_loss}%</div>
+                                </div>
+                            </div>
+                            <div style="display:flex; gap:8px; margin-bottom:12px;">
+                                <span style="font-size:11px; color:var(--muted);">👍 ${s.upvotes}</span>
+                                <span style="font-size:11px; color:var(--muted);">⬇️ ${s.downloads} uses</span>
+                            </div>
+                            <div style="display:flex; gap:8px;">
+                                <button class="btn" onclick="upvoteStrategy('${s.id}')" style="flex:1; background:rgba(255,255,255,0.05); padding:8px;">👍</button>
+                                <button class="btn btn-primary" onclick="applyStrategy('${s.id}')" style="flex:2;">⚡ APPLY</button>
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+            } catch (e) {
+                console.error('Failed to load strategies', e);
+            }
+        }
+
+        function filterStrategies(sortBy, btn) {
+            currentStratSort = sortBy;
+            document.querySelectorAll('.strat-filter').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            loadStrategyGrid(sortBy);
+        }
+
+        async function applyStrategy(stratId) {
+            const token = localStorage.getItem('ssb_token');
+            try {
+                const res = await fetch(`${API}/strategies/${stratId}/apply`, {
+                    method: 'POST',
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                const data = await res.json();
+
+                if (data.success) {
+                    alert('⚡ ' + data.message + '\n\nConfig:\n• Take Profit: ' + data.config.take_profit + '%\n• Stop Loss: ' + data.config.stop_loss + '%\n• Risk: ' + data.config.risk_level);
+                    loadStrategyGrid(currentStratSort);
+                }
+            } catch (e) {
+                alert('❌ Failed to apply strategy');
+            }
+        }
+
+        async function upvoteStrategy(stratId) {
+            const token = localStorage.getItem('ssb_token');
+            try {
+                await fetch(`${API}/strategies/${stratId}/upvote`, {
+                    method: 'POST',
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                loadStrategyGrid(currentStratSort);
+            } catch (e) {
+                console.error('Upvote failed');
+            }
+        }
+
+        function showShareModal() {
+            document.getElementById('share-modal').style.display = 'flex';
+        }
+
+        function hideShareModal() {
+            document.getElementById('share-modal').style.display = 'none';
+        }
+
+        async function submitStrategy() {
+            const token = localStorage.getItem('ssb_token');
+            const payload = {
+                name: document.getElementById('strat-name').value,
+                description: document.getElementById('strat-desc').value,
+                risk_level: document.getElementById('strat-risk').value,
+                min_confidence: parseFloat(document.getElementById('strat-conf').value),
+                take_profit: parseFloat(document.getElementById('strat-tp').value),
+                stop_loss: parseFloat(document.getElementById('strat-sl').value),
+                max_position_size: parseFloat(document.getElementById('strat-size').value)
+            };
+
+            try {
+                const res = await fetch(`${API}/strategies/share`, {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(payload)
+                });
+                const data = await res.json();
+
+                if (data.success) {
+                    alert('🚀 ' + data.message);
+                    hideShareModal();
+                    loadStrategies();
+                } else {
+                    alert('❌ ' + data.detail);
+                }
+            } catch (e) {
+                alert('❌ Failed to share strategy');
             }
         }
 
