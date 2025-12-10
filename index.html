@@ -1902,22 +1902,38 @@
         <div class="mobile-menu" id="mobileMenu">
             <button class="mobile-menu-close" onclick="toggleMobileMenu()">×</button>
 
-            <div
-                style="font-size: 10px; text-transform: uppercase; letter-spacing: 0.15em; color: var(--muted); margin-bottom: 16px;">
-                Navigate</div>
-            <a href="#features" onclick="toggleMobileMenu()">🚀 Features</a>
-            <a href="#pricing" onclick="toggleMobileMenu()">💰 Pricing</a>
-            <a href="#engine" onclick="toggleMobileMenu()">⚙️ Trading Engine</a>
-            <a href="#downloads" onclick="toggleMobileMenu()">⬇️ Downloads</a>
-            <a href="#faq" onclick="toggleMobileMenu()">❓ FAQ</a>
+            <!-- Navigation Group -->
+            <div style="width: 80%; margin-bottom: 20px;">
+                <details
+                    style="margin-bottom: 10px; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 10px;">
+                    <summary
+                        style="font-size: 18px; font-weight: 700; color: var(--accent); cursor: pointer; list-style: none;">
+                        🧭 MENU ▼
+                    </summary>
+                    <div
+                        style="display: flex; flex-direction: column; gap: 16px; margin-top: 16px; padding-left: 10px;">
+                        <a href="#features" onclick="toggleMobileMenu()">🚀 Features</a>
+                        <a href="#pricing" onclick="toggleMobileMenu()">💰 Pricing</a>
+                        <a href="#engine" onclick="toggleMobileMenu()">⚙️ Trading Engine</a>
+                        <a href="#downloads" onclick="toggleMobileMenu()">⬇️ Downloads</a>
+                    </div>
+                </details>
 
-            <div
-                style="font-size: 10px; text-transform: uppercase; letter-spacing: 0.15em; color: var(--muted); margin: 24px 0 16px;">
-                Pages</div>
-            <a href="/dashboard" onclick="toggleMobileMenu()">📊 Dashboard</a>
-            <a href="/admin" onclick="toggleMobileMenu()">🔐 Admin Panel</a>
+                <details style="border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 10px;">
+                    <summary
+                        style="font-size: 18px; font-weight: 700; color: var(--muted); cursor: pointer; list-style: none;">
+                        📄 PAGES ▼
+                    </summary>
+                    <div
+                        style="display: flex; flex-direction: column; gap: 16px; margin-top: 16px; padding-left: 10px;">
+                        <a href="/dashboard" onclick="toggleMobileMenu()">📊 Dashboard</a>
+                        <a href="/admin" onclick="toggleMobileMenu()">🔐 Admin Panel</a>
+                        <a href="#faq" onclick="toggleMobileMenu()">❓ FAQ</a>
+                    </div>
+                </details>
+            </div>
 
-            <div style="margin-top: 32px; width: 80%;">
+            <div style="width: 80%;">
                 <a href="/auth" class="btn-primary"
                     style="display: block; width: 100%; text-align: center; padding: 14px;">Log In / Sign Up</a>
             </div>
@@ -2483,441 +2499,463 @@
             </div>
 
             <div style="display:grid; grid-template-columns: 1fr 1.5fr; gap:24px; margin-top:20px;">
-                <!-- LEFT: QR Code + Wallet -->
+                <!-- LEFT: Payment Options (Simplified) -->
                 <div class="pay-box" style="text-align:center;">
-                    <div style="font-weight:700; font-size:14px; margin-bottom:12px;">💳 Scan to Pay (USDT TRC20)</div>
+                    <div style="font-weight:700; font-size:14px; margin-bottom:12px;">💳 Payment Method (USDT TRC20)
+                    </div>
 
-                    <!-- QR Code Container -->
-                    <div id="qr-container"
-                        style="background:#fff; padding:16px; border-radius:12px; display:inline-block; margin-bottom:12px;">
-                        <canvas id="qr-code" width="180" height="180"></canvas>
+                    <!-- Action Buttons -->
+                    <div style="display:flex; flex-direction:column; gap:10px; margin-bottom:16px;">
+                        <button class="btn-primary" onclick="copyWalletAddress()"
+                            style="width:100%; justify-content:center;">
+                            📋 Copy Wallet Address
+                        </button>
+                        <button class="btn-outline" onclick="showQRModal()" style="width:100%; justify-content:center;">
+                            📱 Show QR Code
+                        </button>
                     </div>
 
                     <div style="font-size:11px; color:var(--muted); margin-bottom:10px;">
-                        Scan with your wallet app to pay
+                        Send exact amount to address below
                     </div>
 
-                    <div style="font-weight:600; font-size:12px; margin-bottom:6px;">USDT (TRC20) Wallet:</div>
-                    <div class="pay-row" style="justify-content:center;">
-                        <div class="wallet-box" id="wallet-address" style="font-size:10px;">
-                            TBxck6t1a3pZE2YLho4Su1PcGKd2yK2zD4</div>
-                        <button class="copy-btn" onclick="copyWallet()">📋</button>
-                    </div>
-
-                    <div style="margin-top:10px; font-size:10px; color:var(--danger);">
-                        ⚠️ TRON Network Only • Double-check address
+                    <div style="background:rgba(0,0,0,0.3); padding:10px; border-radius:8px; border:1px solid rgba(255,255,255,0.1); word-break:break-all; font-family:monospace; font-size:11px; color:var(--accent); cursor:pointer;"
+                        onclick="copyWalletAddress()" title="Click to copy">
+                        TBxck6t1a3pZE2YLho4Su1PcGKd2yK2zD4
                     </div>
                 </div>
 
-                <!-- RIGHT: Web Payment Form -->
+                <!-- QR Modal (Hidden by Default) -->
+                <div id="qr-modal"
+                    style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.9); z-index:2500; align-items:center; justify-content:center; flex-direction:column; animation:fadeIn 0.3s;">
+                    <button onclick="closeQRModal()"
+                        style="position:absolute; top:20px; right:20px; background:none; border:none; color:white; font-size:32px; cursor:pointer;">&times;</button>
+
+                    <div style="background:white; padding:20px; border-radius:16px; text-align:center;">
+                        <canvas id="qr-code" width="220" height="220"></canvas>
+                        <p style="color:black; font-weight:bold; margin-top:10px;">Scan to Pay</p>
+                    </div>
+                    <button class="btn-outline" onclick="closeQRModal()"
+                        style="margin-top:20px; width:auto; padding:10px 30px;">Close</button>
+                </div>
+                <div class="pay-row" style="justify-content:center;">
+                    <div class="wallet-box" id="wallet-address" style="font-size:10px;">
+                        TBxck6t1a3pZE2YLho4Su1PcGKd2yK2zD4</div>
+                    <button class="copy-btn" onclick="copyWallet()">📋</button>
+                </div>
+
+                <div style="margin-top:10px; font-size:10px; color:var(--danger);">
+                    ⚠️ TRON Network Only • Double-check address
+                </div>
+            </div>
+
+            <!-- RIGHT: Web Payment Form -->
+            <div
+                style="background:rgba(15,23,42,0.95); border:1px solid rgba(55,65,81,0.8); border-radius:16px; padding:20px;">
                 <div
-                    style="background:rgba(15,23,42,0.95); border:1px solid rgba(55,65,81,0.8); border-radius:16px; padding:20px;">
-                    <div
-                        style="font-weight:700; font-size:16px; margin-bottom:16px; display:flex; align-items:center; gap:8px;">
-                        ⚡ Instant Web Checkout
-                        <span
-                            style="font-size:10px; padding:3px 8px; background:rgba(34,197,94,0.15); color:var(--success); border-radius:999px;">FAST</span>
+                    style="font-weight:700; font-size:16px; margin-bottom:16px; display:flex; align-items:center; gap:8px;">
+                    ⚡ Instant Web Checkout
+                    <span
+                        style="font-size:10px; padding:3px 8px; background:rgba(34,197,94,0.15); color:var(--success); border-radius:999px;">FAST</span>
+                </div>
+
+                <form id="payment-form" onsubmit="submitPayment(event)">
+                    <!-- Email -->
+                    <div style="margin-bottom:14px;">
+                        <label style="font-size:12px; color:var(--muted); display:block; margin-bottom:4px;">Your
+                            Email *</label>
+                        <input type="email" id="pay-email" required placeholder="your@email.com"
+                            style="width:100%; padding:12px 14px; border-radius:10px; border:1px solid rgba(55,65,81,0.8); background:rgba(0,0,0,0.4); color:var(--text); font-size:14px;">
                     </div>
 
-                    <form id="payment-form" onsubmit="submitPayment(event)">
-                        <!-- Email -->
-                        <div style="margin-bottom:14px;">
-                            <label style="font-size:12px; color:var(--muted); display:block; margin-bottom:4px;">Your
-                                Email *</label>
-                            <input type="email" id="pay-email" required placeholder="your@email.com"
-                                style="width:100%; padding:12px 14px; border-radius:10px; border:1px solid rgba(55,65,81,0.8); background:rgba(0,0,0,0.4); color:var(--text); font-size:14px;">
-                        </div>
-
-                        <!-- Plan Selection -->
-                        <div style="margin-bottom:14px;">
-                            <label style="font-size:12px; color:var(--muted); display:block; margin-bottom:4px;">Select
-                                Plan *</label>
-                            <select id="pay-plan" required
-                                style="width:100%; padding:12px 14px; border-radius:10px; border:1px solid rgba(55,65,81,0.8); background:rgba(0,0,0,0.4); color:var(--text); font-size:14px;">
-                                <option value="">-- Choose a Plan --</option>
-                                <optgroup label="☁️ Cloud Plans (Monthly)">
-                                    <option value="CLOUD_SNIPER_79">☁️ CLOUD SNIPER – $79/mo</option>
-                                    <option value="CLOUD_SNIPER_PRO_149">☁️ CLOUD SNIPER PRO – $149/mo ⭐</option>
-                                    <option value="CLOUD_SNIPER_ELITE_249">☁️ CLOUD SNIPER ELITE – $249/mo 👑</option>
-                                </optgroup>
-                                <optgroup label="💎 Desktop Licenses (One-Time)">
-                                    <option value="STANDARD_LOCAL_199">🟪 STANDARD LOCAL – $199</option>
-                                    <option value="PRO_LOCAL_499">🟦 PRO LOCAL – $499 ⭐</option>
-                                    <option value="ELITE_LOCAL_899">🟩 ELITE LOCAL – $899 👑</option>
-                                </optgroup>
-                            </select>
-                        </div>
-
-                        <!-- TX Hash -->
-                        <div style="margin-bottom:14px;">
-                            <label
-                                style="font-size:12px; color:var(--muted); display:block; margin-bottom:4px;">Transaction
-                                Hash (TX Hash) *</label>
-                            <input type="text" id="pay-txhash" required
-                                placeholder="Paste your TX hash here after sending USDT"
-                                style="width:100%; padding:12px 14px; border-radius:10px; border:1px solid rgba(55,65,81,0.8); background:rgba(0,0,0,0.4); color:var(--text); font-size:13px; font-family:monospace;">
-                            <div style="font-size:10px; color:var(--muted); margin-top:4px;">
-                                📍 Find this in your wallet after sending USDT, or on <a href="https://tronscan.org"
-                                    target="_blank">TronScan</a>
-                            </div>
-                        </div>
-
-                        <!-- Optional: Note -->
-                        <div style="margin-bottom:16px;">
-                            <label style="font-size:12px; color:var(--muted); display:block; margin-bottom:4px;">Note
-                                (Optional)</label>
-                            <input type="text" id="pay-note" placeholder="Discord username, Telegram, etc."
-                                style="width:100%; padding:10px 14px; border-radius:10px; border:1px solid rgba(55,65,81,0.8); background:rgba(0,0,0,0.4); color:var(--text); font-size:13px;">
-                        </div>
-
-                        <!-- Submit -->
-                        <button type="submit" class="btn-primary" style="width:100%; padding:14px; font-size:15px;">
-                            ✅ Submit Payment Proof
-                        </button>
-                    </form>
-
-                    <div id="payment-result"
-                        style="display:none; margin-top:16px; padding:14px; border-radius:10px; text-align:center;">
+                    <!-- Plan Selection -->
+                    <div style="margin-bottom:14px;">
+                        <label style="font-size:12px; color:var(--muted); display:block; margin-bottom:4px;">Select
+                            Plan *</label>
+                        <select id="pay-plan" required
+                            style="width:100%; padding:12px 14px; border-radius:10px; border:1px solid rgba(55,65,81,0.8); background:rgba(0,0,0,0.4); color:var(--text); font-size:14px;">
+                            <option value="">-- Choose a Plan --</option>
+                            <optgroup label="☁️ Cloud Plans (Monthly)">
+                                <option value="CLOUD_SNIPER_79">☁️ CLOUD SNIPER – $79/mo</option>
+                                <option value="CLOUD_SNIPER_PRO_149">☁️ CLOUD SNIPER PRO – $149/mo ⭐</option>
+                                <option value="CLOUD_SNIPER_ELITE_249">☁️ CLOUD SNIPER ELITE – $249/mo 👑</option>
+                            </optgroup>
+                            <optgroup label="💎 Desktop Licenses (One-Time)">
+                                <option value="STANDARD_LOCAL_199">🟪 STANDARD LOCAL – $199</option>
+                                <option value="PRO_LOCAL_499">🟦 PRO LOCAL – $499 ⭐</option>
+                                <option value="ELITE_LOCAL_899">🟩 ELITE LOCAL – $899 👑</option>
+                            </optgroup>
+                        </select>
                     </div>
 
-                    <div style="margin-top:12px; font-size:11px; color:var(--muted); text-align:center;">
-                        🔒 Your license will be delivered to your email within 1-24 hours after verification
+                    <!-- TX Hash -->
+                    <div style="margin-bottom:14px;">
+                        <label style="font-size:12px; color:var(--muted); display:block; margin-bottom:4px;">Transaction
+                            Hash (TX Hash) *</label>
+                        <input type="text" id="pay-txhash" required
+                            placeholder="Paste your TX hash here after sending USDT"
+                            style="width:100%; padding:12px 14px; border-radius:10px; border:1px solid rgba(55,65,81,0.8); background:rgba(0,0,0,0.4); color:var(--text); font-size:13px; font-family:monospace;">
+                        <div style="font-size:10px; color:var(--muted); margin-top:4px;">
+                            📍 Find this in your wallet after sending USDT, or on <a href="https://tronscan.org"
+                                target="_blank">TronScan</a>
+                        </div>
                     </div>
+
+                    <!-- Optional: Note -->
+                    <div style="margin-bottom:16px;">
+                        <label style="font-size:12px; color:var(--muted); display:block; margin-bottom:4px;">Note
+                            (Optional)</label>
+                        <input type="text" id="pay-note" placeholder="Discord username, Telegram, etc."
+                            style="width:100%; padding:10px 14px; border-radius:10px; border:1px solid rgba(55,65,81,0.8); background:rgba(0,0,0,0.4); color:var(--text); font-size:13px;">
+                    </div>
+
+                    <!-- Submit -->
+                    <button type="submit" class="btn-primary" style="width:100%; padding:14px; font-size:15px;">
+                        ✅ Submit Payment Proof
+                    </button>
+                </form>
+
+                <div id="payment-result"
+                    style="display:none; margin-top:16px; padding:14px; border-radius:10px; text-align:center;">
+                </div>
+
+                <div style="margin-top:12px; font-size:11px; color:var(--muted); text-align:center;">
+                    🔒 Your license will be delivered to your email within 1-24 hours after verification
                 </div>
             </div>
+    </div>
 
-            <!-- Alternative: Telegram -->
-            <div
-                style="margin-top:20px; padding:16px; background:rgba(0,0,0,0.2); border:1px dashed rgba(55,65,81,0.6); border-radius:12px; text-align:center;">
-                <div style="font-size:13px; margin-bottom:8px;">
-                    🤖 <strong>Prefer Telegram?</strong> You can also submit via our Order Bot
-                </div>
-                <button class="btn-outline" onclick="openTelegram()" style="font-size:12px; padding:10px 20px;">
-                    📱 Open Telegram Order Bot
+    <!-- Alternative: Telegram -->
+    <div
+        style="margin-top:20px; padding:16px; background:rgba(0,0,0,0.2); border:1px dashed rgba(55,65,81,0.6); border-radius:12px; text-align:center;">
+        <div style="font-size:13px; margin-bottom:8px;">
+            🤖 <strong>Prefer Telegram?</strong> You can also submit via our Order Bot
+        </div>
+        <button class="btn-outline" onclick="openTelegram()" style="font-size:12px; padding:10px 20px;">
+            📱 Open Telegram Order Bot
+        </button>
+    </div>
+    </section>
+
+    <!-- TESTIMONIALS -->
+    <section id="social-proof">
+        <h2>💬 What Traders Say</h2>
+        <div class="testimonial-grid">
+            <div class="testimonial-card">
+                "Left it on DRY RUN and saw multiple tokens hit TP that I would have never found manually. The
+                filters are legit."
+                <div class="testimonial-name">— K., Solana degen</div>
+                <div class="testimonial-tag">DEMO → CLOUD PRO</div>
+            </div>
+            <div class="testimonial-card">
+                "The risk engine feels like a second brain. No more staring at Pump.fun 24/7."
+                <div class="testimonial-name">— L., Part-time trader</div>
+                <div class="testimonial-tag">CLOUD PRO user</div>
+            </div>
+            <div class="testimonial-card">
+                "Took ELITE because I'm here all cycle. Love the cloud monitoring + Telegram alerts."
+                <div class="testimonial-name">— M., Full-time trader</div>
+                <div class="testimonial-tag">CLOUD ELITE user</div>
+            </div>
+        </div>
+    </section>
+
+    <!-- DOWNLOAD -->
+    <section id="download">
+        <h2>🆓 Download Free DRY RUN Demo</h2>
+        <p>Test the engine risk-free. No license, no payment. Upgrade when ready.</p>
+        <div class="download-box">
+            <p><strong>Demo includes:</strong></p>
+            <ul>
+                <li>Full DRY RUN mode (no real trades)</li>
+                <li>Same AI Risk Engine v3</li>
+                <li>Console logs + simulated trades</li>
+            </ul>
+            <div style="margin-top:12px;">
+                <button class="btn-outline" onclick="window.location.href='#'">
+                    ⬇️ Download DRY RUN Demo (Free)
                 </button>
             </div>
-        </section>
+        </div>
+    </section>
 
-        <!-- TESTIMONIALS -->
-        <section id="social-proof">
-            <h2>💬 What Traders Say</h2>
-            <div class="testimonial-grid">
-                <div class="testimonial-card">
-                    "Left it on DRY RUN and saw multiple tokens hit TP that I would have never found manually. The
-                    filters are legit."
-                    <div class="testimonial-name">— K., Solana degen</div>
-                    <div class="testimonial-tag">DEMO → CLOUD PRO</div>
-                </div>
-                <div class="testimonial-card">
-                    "The risk engine feels like a second brain. No more staring at Pump.fun 24/7."
-                    <div class="testimonial-name">— L., Part-time trader</div>
-                    <div class="testimonial-tag">CLOUD PRO user</div>
-                </div>
-                <div class="testimonial-card">
-                    "Took ELITE because I'm here all cycle. Love the cloud monitoring + Telegram alerts."
-                    <div class="testimonial-name">— M., Full-time trader</div>
-                    <div class="testimonial-tag">CLOUD ELITE user</div>
-                </div>
-            </div>
-        </section>
+    <!-- CLOUD ACCOUNT & LICENSE PANEL -->
+    <section id="license-panel" class="fade-section">
+        <h2>🔐 Cloud Account & License Panel</h2>
+        <p>Manage your cloud subscription, license, and device binding. <em>(Preview – login to access)</em></p>
 
-        <!-- DOWNLOAD -->
-        <section id="download">
-            <h2>🆓 Download Free DRY RUN Demo</h2>
-            <p>Test the engine risk-free. No license, no payment. Upgrade when ready.</p>
-            <div class="download-box">
-                <p><strong>Demo includes:</strong></p>
-                <ul>
-                    <li>Full DRY RUN mode (no real trades)</li>
-                    <li>Same AI Risk Engine v3</li>
-                    <li>Console logs + simulated trades</li>
-                </ul>
-                <div style="margin-top:12px;">
-                    <button class="btn-outline" onclick="window.location.href='#'">
-                        ⬇️ Download DRY RUN Demo (Free)
-                    </button>
+        <div style="display:flex; justify-content:flex-end; margin-bottom:16px;">
+            <button class="btn-outline" style="font-size:12px; padding:8px 16px;"
+                onclick="alert('Login feature coming soon!')">
+                🔑 Login to Dashboard
+            </button>
+        </div>
+
+        <div class="license-panel-grid">
+            <!-- Email Verification -->
+            <div class="license-card">
+                <div class="license-card-title">📧 Email Verification</div>
+                <div class="license-card-value">
+                    <span class="status-dot green"></span> Verified
                 </div>
-            </div>
-        </section>
-
-        <!-- CLOUD ACCOUNT & LICENSE PANEL -->
-        <section id="license-panel" class="fade-section">
-            <h2>🔐 Cloud Account & License Panel</h2>
-            <p>Manage your cloud subscription, license, and device binding. <em>(Preview – login to access)</em></p>
-
-            <div style="display:flex; justify-content:flex-end; margin-bottom:16px;">
-                <button class="btn-outline" style="font-size:12px; padding:8px 16px;"
-                    onclick="alert('Login feature coming soon!')">
-                    🔑 Login to Dashboard
+                <div style="font-size:11px; color:var(--muted); margin-bottom:8px;">user@example.com</div>
+                <button class="license-card-btn" onclick="alert('Verification email sent!')">
+                    Send Verification Email
                 </button>
             </div>
 
-            <div class="license-panel-grid">
-                <!-- Email Verification -->
-                <div class="license-card">
-                    <div class="license-card-title">📧 Email Verification</div>
-                    <div class="license-card-value">
-                        <span class="status-dot green"></span> Verified
-                    </div>
-                    <div style="font-size:11px; color:var(--muted); margin-bottom:8px;">user@example.com</div>
-                    <button class="license-card-btn" onclick="alert('Verification email sent!')">
-                        Send Verification Email
-                    </button>
+            <!-- License Token -->
+            <div class="license-card">
+                <div class="license-card-title">🔑 License Token</div>
+                <div class="license-card-value" style="font-family:monospace; font-size:13px;">
+                    SSB-****-****-8X9Z
                 </div>
-
-                <!-- License Token -->
-                <div class="license-card">
-                    <div class="license-card-title">🔑 License Token</div>
-                    <div class="license-card-value" style="font-family:monospace; font-size:13px;">
-                        SSB-****-****-8X9Z
-                    </div>
-                    <button class="license-card-btn" onclick="copyLicenseToken()">
-                        📋 Copy Token
-                    </button>
-                </div>
-
-                <!-- Device Binding -->
-                <div class="license-card">
-                    <a href="auth.html" class="text-gray-300 hover:text-white transition-colors text-sm font-medium">Log
-                        In</a>
-                    <a href="auth.html"
-                        class="px-5 py-2.5 rounded-lg bg-gradient-to-r from-cyan-500 to-blue-600 text-white text-sm font-semibold hover:opacity-90 transition-opacity shadow-[0_0_20px_rgba(6,182,212,0.3)]">
-                        Get Started
-                    </a>
-                    <div style="font-size:11px; color:var(--muted); margin-bottom:8px;">
-                        Slots: <strong>1/2</strong> used
-                    </div>
-                    <button class="license-card-btn" onclick="alert('Contact support to reset device binding.')">
-                        Reset Device
-                    </button>
-                </div>
-
-                <!-- Cloud Usage -->
-                <div class="license-card">
-                    <div class="license-card-title">☁️ Cloud Usage</div>
-                    <div style="font-size:12px; color:var(--muted);">
-                        <div style="display:flex; justify-content:space-between; margin-bottom:4px;">
-                            <span>Trades Today</span>
-                            <strong style="color:var(--accent);">47 / 100</strong>
-                        </div>
-                        <div style="display:flex; justify-content:space-between; margin-bottom:4px;">
-                            <span>Validation Interval</span>
-                            <strong>5 min</strong>
-                        </div>
-                        <div style="display:flex; justify-content:space-between; align-items:center;">
-                            <span>Server Status</span>
-                            <span><span class="status-dot green"></span> <strong
-                                    style="color:var(--success);">OK</strong></span>
-                        </div>
-                    </div>
-                </div>
+                <button class="license-card-btn" onclick="copyLicenseToken()">
+                    📋 Copy Token
+                </button>
             </div>
 
-            <div
-                style="margin-top:16px; padding:12px; background:rgba(34,211,238,0.05); border:1px solid rgba(34,211,238,0.2); border-radius:10px; font-size:11px; color:var(--muted); text-align:center;">
-                🔒 Cloud Validation: <strong style="color:var(--success);">Active</strong> • Last Check: 2 min ago •
-                License expires: <strong>Jan 8, 2025</strong>
-            </div>
-        </section>
-
-        <!-- 🚀 QUICK START - TRY BEFORE YOU BUY -->
-        <section id="quick-start" class="fade-section"
-            style="background: linear-gradient(145deg, rgba(34,197,94,0.08), rgba(15,23,42,0.98)); border-color: rgba(34,197,94,0.4);">
-            <h2>🚀 Get Started in 60 Seconds</h2>
-            <p>
-                <strong>Zero risk, zero commitment.</strong> Download the free demo and see the AI engine in action.
-                Or login to your Cloud account and start trading immediately.
-            </p>
-
-            <div style="display:grid; grid-template-columns: repeat(3, 1fr); gap:20px; margin-top:24px;">
-                <!-- FREE DEMO -->
-                <div class="license-card" style="text-align:center; border-color: rgba(34,197,94,0.5);">
-                    <div style="font-size:36px; margin-bottom:8px;">🆓</div>
-                    <div style="font-size:16px; font-weight:700; margin-bottom:6px;">Free DRY RUN Demo</div>
-                    <p style="font-size:12px; color:var(--muted); margin-bottom:12px;">
-                        Download the EXE or Python source. See the AI engine work in simulation mode. No license
-                        required.
-                    </p>
-                    <div style="display:flex; flex-direction:column; gap:8px;">
-                        <button class="btn-primary" onclick="window.location.href='#download'"
-                            style="font-size:12px; padding:10px 16px;">
-                            ⬇️ Download Demo (.EXE)
-                        </button>
-                        <button class="btn-outline" onclick="window.location.href='#download'"
-                            style="font-size:11px; padding:8px 12px;">
-                            📦 Download (.ZIP Source)
-                        </button>
-                    </div>
-                    <div style="font-size:10px; color:var(--success); margin-top:8px;">✓ No payment • ✓ No signup</div>
+            <!-- Device Binding -->
+            <div class="license-card">
+                <a href="auth.html" class="text-gray-300 hover:text-white transition-colors text-sm font-medium">Log
+                    In</a>
+                <a href="auth.html"
+                    class="px-5 py-2.5 rounded-lg bg-gradient-to-r from-cyan-500 to-blue-600 text-white text-sm font-semibold hover:opacity-90 transition-opacity shadow-[0_0_20px_rgba(6,182,212,0.3)]">
+                    Get Started
+                </a>
+                <div style="font-size:11px; color:var(--muted); margin-bottom:8px;">
+                    Slots: <strong>1/2</strong> used
                 </div>
-
-                <!-- CLOUD LOGIN -->
-                <div class="license-card" style="text-align:center; border-color: rgba(34,211,238,0.5);">
-                    <div style="font-size:36px; margin-bottom:8px;">☁️</div>
-                    <div style="font-size:16px; font-weight:700; margin-bottom:6px;">Cloud Account</div>
-                    <p style="font-size:12px; color:var(--muted); margin-bottom:12px;">
-                        Already have a license? Login to your cloud dashboard and manage your bot settings.
-                    </p>
-                    <div style="display:flex; flex-direction:column; gap:8px;">
-                        <button class="btn-primary" onclick="window.location.href='/cloud/login'"
-                            style="font-size:12px; padding:10px 16px;">
-                            🔑 Login to Dashboard
-                        </button>
-                        <button class="btn-outline" onclick="window.location.href='/cloud/register'"
-                            style="font-size:11px; padding:8px 12px;">
-                            📝 Create New Account
-                        </button>
-                    </div>
-                    <div style="font-size:10px; color:var(--accent); margin-top:8px;">For paid subscribers only</div>
-                </div>
-
-                <!-- BUY LICENSE -->
-                <div class="license-card" style="text-align:center; border-color: rgba(168,85,247,0.5);">
-                    <div style="font-size:36px; margin-bottom:8px;">💎</div>
-                    <div style="font-size:16px; font-weight:700; margin-bottom:6px;">Get a License</div>
-                    <p style="font-size:12px; color:var(--muted); margin-bottom:12px;">
-                        Ready to trade live? Choose Cloud ($79-249/mo) or Desktop EXE ($199-899 one-time).
-                    </p>
-                    <div style="display:flex; flex-direction:column; gap:8px;">
-                        <button class="btn-primary"
-                            onclick="document.getElementById('pricing').scrollIntoView({behavior:'smooth'});"
-                            style="font-size:12px; padding:10px 16px;">
-                            💳 View Pricing Plans
-                        </button>
-                        <button class="btn-outline" onclick="openTelegram()" style="font-size:11px; padding:8px 12px;">
-                            📱 Order via Telegram
-                        </button>
-                    </div>
-                    <div style="font-size:10px; color:var(--accent2); margin-top:8px;">USDT TRC20 • Instant delivery
-                    </div>
-                </div>
+                <button class="license-card-btn" onclick="alert('Contact support to reset device binding.')">
+                    Reset Device
+                </button>
             </div>
 
-            <!-- Trust Assurance -->
-            <div
-                style="margin-top:24px; display:grid; grid-template-columns: repeat(4, 1fr); gap:12px; text-align:center;">
-                <div style="padding:12px; background:rgba(0,0,0,0.3); border-radius:10px;">
-                    <div style="font-size:20px; font-weight:800; color:var(--success);">2,000+</div>
-                    <div style="font-size:11px; color:var(--muted);">Active Traders</div>
-                </div>
-                <div style="padding:12px; background:rgba(0,0,0,0.3); border-radius:10px;">
-                    <div style="font-size:20px; font-weight:800; color:var(--accent);">99.8%</div>
-                    <div style="font-size:11px; color:var(--muted);">Uptime</div>
-                </div>
-                <div style="padding:12px; background:rgba(0,0,0,0.3); border-radius:10px;">
-                    <div style="font-size:20px; font-weight:800; color:var(--accent2);">24/7</div>
-                    <div style="font-size:11px; color:var(--muted);">Cloud Trading</div>
-                </div>
-                <div style="padding:12px; background:rgba(0,0,0,0.3); border-radius:10px;">
-                    <div style="font-size:20px; font-weight:800; color:#facc15;">5 min</div>
-                    <div style="font-size:11px; color:var(--muted);">License Delivery</div>
-                </div>
-            </div>
-        </section>
-
-        <!-- FAQ -->
-        <section id="faq" class="fade-section">
-            <h2>❓ Frequently Asked Questions</h2>
-            <p>Got questions? We've got answers. Click any question to expand.</p>
-
-            <div style="display:grid; grid-template-columns: repeat(2, 1fr); gap:12px; margin-top:16px;">
-                <div class="faq-item">
-                    <div class="faq-q">Does this guarantee profit?</div>
-                    <div class="faq-a">No. SSB is a <strong>tool</strong>, not a money printer. We provide AI-powered
-                        signals and filters, but crypto trading is inherently risky. You control your settings, risk,
-                        and capital. Never trade money you can't afford to lose.</div>
-                </div>
-
-                <div class="faq-item">
-                    <div class="faq-q">What's the difference between Cloud and Local?</div>
-                    <div class="faq-a"><strong>Cloud plans</strong> run on our servers 24/7, include Telegram alerts,
-                        remote monitoring, and auto-restart. <strong>Local EXE</strong> runs on your computer—no cloud
-                        features, but one-time payment and full control.</div>
-                </div>
-
-                <div class="faq-item">
-                    <div class="faq-q">Is my license protected?</div>
-                    <div class="faq-a">Yes. All licenses are tied to your <strong>email + HWID + token</strong>. Cloud
-                        plans validate every 5 minutes. Sharing your license will result in automatic suspension. We
-                        take security seriously.</div>
-                </div>
-
-                <div class="faq-item">
-                    <div class="faq-q">Can I upgrade my plan later?</div>
-                    <div class="faq-a">Absolutely! You can upgrade anytime by paying the <strong>difference in
-                            price</strong>. Contact support via Telegram with your current license email, and we'll
-                        handle the upgrade.</div>
-                </div>
-
-                <div class="faq-item">
-                    <div class="faq-q">How do I get my license after payment?</div>
-                    <div class="faq-a">After sending USDT, submit your <strong>TX hash + email</strong> via our web form
-                        or Telegram bot. We verify the transaction (usually within 5-60 minutes), then email your
-                        license key + download link.</div>
-                </div>
-
-                <div class="faq-item">
-                    <div class="faq-q">What payment methods do you accept?</div>
-                    <div class="faq-a"><strong>USDT (TRC20) only</strong>. We use the TRON network for fast, low-fee
-                        transactions. Send to our official wallet and submit your TX hash for verification. No credit
-                        cards or PayPal.</div>
-                </div>
-
-                <div class="faq-item">
-                    <div class="faq-q">Is there a refund policy?</div>
-                    <div class="faq-a"><strong>Crypto payments are final</strong> and non-refundable. That's why we
-                        offer a <strong>FREE DRY RUN demo</strong>—test the engine risk-free before buying. If you have
-                        technical issues, contact support.</div>
-                </div>
-
-                <div class="faq-item">
-                    <div class="faq-q">How do I contact support?</div>
-                    <div class="faq-a">Telegram is fastest: <strong>@SSB_Support</strong>. For license issues, include
-                        your email and TX hash. We typically respond within 1-6 hours.</div>
-                </div>
-
-                <div class="faq-item">
-                    <div class="faq-q">What RPC nodes should I use?</div>
-                    <div class="faq-a">We recommend <strong>Helius, Quicknode, or Alchemy</strong> for best performance.
-                        Cloud plans include our optimized RPC pool. Local users need to provide their own RPC endpoint.
-                    </div>
-                </div>
-
-                <div class="faq-item">
-                    <div class="faq-q">Does SSB work on Mac/Linux?</div>
-                    <div class="faq-a">The EXE is Windows-only. However, we provide <strong>Python source code</strong>
-                        that works on Mac, Linux, and VPS. Cloud plans work on any device via web dashboard.</div>
-                </div>
-
-                <div class="faq-item">
-                    <div class="faq-q">What is the AI Risk Engine?</div>
-                    <div class="faq-a">Our proprietary engine scores each token 0-100 based on <strong>liquidity depth,
-                            volume spikes, holder patterns, honeypot detection, whale activity</strong>, and more. Only
-                        tokens passing your confidence threshold trigger trades.</div>
-                </div>
-
-                <div class="faq-item">
-                    <div class="faq-q">Is this legal?</div>
-                    <div class="faq-a">SSB is a <strong>trading automation tool</strong>. It's legal to use in most
-                        jurisdictions. However, you are responsible for complying with your local laws regarding
-                        cryptocurrency trading and taxes.</div>
-                </div>
-            </div>
-
-            <div
-                style="margin-top:20px; padding:16px; background:rgba(34,197,94,0.08); border:1px solid rgba(34,197,94,0.3); border-radius:12px; text-align:center;">
-                <div style="font-size:14px; font-weight:600; margin-bottom:8px;">🛡️ Our Commitment to You</div>
+            <!-- Cloud Usage -->
+            <div class="license-card">
+                <div class="license-card-title">☁️ Cloud Usage</div>
                 <div style="font-size:12px; color:var(--muted);">
-                    ✓ Active development since 2023 • ✓ Regular updates with new features • ✓ Responsive Telegram
-                    support • ✓ 2,000+ active traders trust SSB
+                    <div style="display:flex; justify-content:space-between; margin-bottom:4px;">
+                        <span>Trades Today</span>
+                        <strong style="color:var(--accent);">47 / 100</strong>
+                    </div>
+                    <div style="display:flex; justify-content:space-between; margin-bottom:4px;">
+                        <span>Validation Interval</span>
+                        <strong>5 min</strong>
+                    </div>
+                    <div style="display:flex; justify-content:space-between; align-items:center;">
+                        <span>Server Status</span>
+                        <span><span class="status-dot green"></span> <strong
+                                style="color:var(--success);">OK</strong></span>
+                    </div>
                 </div>
             </div>
-        </section>
+        </div>
 
-        <footer>
-            © 2025 Sol Sniper Bot PRO (SSB). All rights reserved.<br>
-            Educational use only. No profit guarantees. Crypto trading is risky.
-        </footer>
+        <div
+            style="margin-top:16px; padding:12px; background:rgba(34,211,238,0.05); border:1px solid rgba(34,211,238,0.2); border-radius:10px; font-size:11px; color:var(--muted); text-align:center;">
+            🔒 Cloud Validation: <strong style="color:var(--success);">Active</strong> • Last Check: 2 min ago •
+            License expires: <strong>Jan 8, 2025</strong>
+        </div>
+    </section>
+
+    <!-- 🚀 QUICK START - TRY BEFORE YOU BUY -->
+    <section id="quick-start" class="fade-section"
+        style="background: linear-gradient(145deg, rgba(34,197,94,0.08), rgba(15,23,42,0.98)); border-color: rgba(34,197,94,0.4);">
+        <h2>🚀 Get Started in 60 Seconds</h2>
+        <p>
+            <strong>Zero risk, zero commitment.</strong> Download the free demo and see the AI engine in action.
+            Or login to your Cloud account and start trading immediately.
+        </p>
+
+        <div style="display:grid; grid-template-columns: repeat(3, 1fr); gap:20px; margin-top:24px;">
+            <!-- FREE DEMO -->
+            <div class="license-card" style="text-align:center; border-color: rgba(34,197,94,0.5);">
+                <div style="font-size:36px; margin-bottom:8px;">🆓</div>
+                <div style="font-size:16px; font-weight:700; margin-bottom:6px;">Free DRY RUN Demo</div>
+                <p style="font-size:12px; color:var(--muted); margin-bottom:12px;">
+                    Download the EXE or Python source. See the AI engine work in simulation mode. No license
+                    required.
+                </p>
+                <div style="display:flex; flex-direction:column; gap:8px;">
+                    <button class="btn-primary" onclick="window.location.href='#download'"
+                        style="font-size:12px; padding:10px 16px;">
+                        ⬇️ Download Demo (.EXE)
+                    </button>
+                    <button class="btn-outline" onclick="window.location.href='#download'"
+                        style="font-size:11px; padding:8px 12px;">
+                        📦 Download (.ZIP Source)
+                    </button>
+                </div>
+                <div style="font-size:10px; color:var(--success); margin-top:8px;">✓ No payment • ✓ No signup</div>
+            </div>
+
+            <!-- CLOUD LOGIN -->
+            <div class="license-card" style="text-align:center; border-color: rgba(34,211,238,0.5);">
+                <div style="font-size:36px; margin-bottom:8px;">☁️</div>
+                <div style="font-size:16px; font-weight:700; margin-bottom:6px;">Cloud Account</div>
+                <p style="font-size:12px; color:var(--muted); margin-bottom:12px;">
+                    Already have a license? Login to your cloud dashboard and manage your bot settings.
+                </p>
+                <div style="display:flex; flex-direction:column; gap:8px;">
+                    <button class="btn-primary" onclick="window.location.href='/cloud/login'"
+                        style="font-size:12px; padding:10px 16px;">
+                        🔑 Login to Dashboard
+                    </button>
+                    <button class="btn-outline" onclick="window.location.href='/cloud/register'"
+                        style="font-size:11px; padding:8px 12px;">
+                        📝 Create New Account
+                    </button>
+                </div>
+                <div style="font-size:10px; color:var(--accent); margin-top:8px;">For paid subscribers only</div>
+            </div>
+
+            <!-- BUY LICENSE -->
+            <div class="license-card" style="text-align:center; border-color: rgba(168,85,247,0.5);">
+                <div style="font-size:36px; margin-bottom:8px;">💎</div>
+                <div style="font-size:16px; font-weight:700; margin-bottom:6px;">Get a License</div>
+                <p style="font-size:12px; color:var(--muted); margin-bottom:12px;">
+                    Ready to trade live? Choose Cloud ($79-249/mo) or Desktop EXE ($199-899 one-time).
+                </p>
+                <div style="display:flex; flex-direction:column; gap:8px;">
+                    <button class="btn-primary"
+                        onclick="document.getElementById('pricing').scrollIntoView({behavior:'smooth'});"
+                        style="font-size:12px; padding:10px 16px;">
+                        💳 View Pricing Plans
+                    </button>
+                    <button class="btn-outline" onclick="openTelegram()" style="font-size:11px; padding:8px 12px;">
+                        📱 Order via Telegram
+                    </button>
+                </div>
+                <div style="font-size:10px; color:var(--accent2); margin-top:8px;">USDT TRC20 • Instant delivery
+                </div>
+            </div>
+        </div>
+
+        <!-- Trust Assurance -->
+        <div style="margin-top:24px; display:grid; grid-template-columns: repeat(4, 1fr); gap:12px; text-align:center;">
+            <div style="padding:12px; background:rgba(0,0,0,0.3); border-radius:10px;">
+                <div style="font-size:20px; font-weight:800; color:var(--success);">2,000+</div>
+                <div style="font-size:11px; color:var(--muted);">Active Traders</div>
+            </div>
+            <div style="padding:12px; background:rgba(0,0,0,0.3); border-radius:10px;">
+                <div style="font-size:20px; font-weight:800; color:var(--accent);">99.8%</div>
+                <div style="font-size:11px; color:var(--muted);">Uptime</div>
+            </div>
+            <div style="padding:12px; background:rgba(0,0,0,0.3); border-radius:10px;">
+                <div style="font-size:20px; font-weight:800; color:var(--accent2);">24/7</div>
+                <div style="font-size:11px; color:var(--muted);">Cloud Trading</div>
+            </div>
+            <div style="padding:12px; background:rgba(0,0,0,0.3); border-radius:10px;">
+                <div style="font-size:20px; font-weight:800; color:#facc15;">5 min</div>
+                <div style="font-size:11px; color:var(--muted);">License Delivery</div>
+            </div>
+        </div>
+    </section>
+
+    <!-- FAQ -->
+    <section id="faq" class="fade-section">
+        <h2>❓ Frequently Asked Questions</h2>
+        <p>Got questions? We've got answers. Click any question to expand.</p>
+
+        <div style="display:grid; grid-template-columns: repeat(2, 1fr); gap:12px; margin-top:16px;">
+            <div class="faq-item">
+                <div class="faq-q">Does this guarantee profit?</div>
+                <div class="faq-a">No. SSB is a <strong>tool</strong>, not a money printer. We provide AI-powered
+                    signals and filters, but crypto trading is inherently risky. You control your settings, risk,
+                    and capital. Never trade money you can't afford to lose.</div>
+            </div>
+
+            <div class="faq-item">
+                <div class="faq-q">What's the difference between Cloud and Local?</div>
+                <div class="faq-a"><strong>Cloud plans</strong> run on our servers 24/7, include Telegram alerts,
+                    remote monitoring, and auto-restart. <strong>Local EXE</strong> runs on your computer—no cloud
+                    features, but one-time payment and full control.</div>
+            </div>
+
+            <div class="faq-item">
+                <div class="faq-q">Is my license protected?</div>
+                <div class="faq-a">Yes. All licenses are tied to your <strong>email + HWID + token</strong>. Cloud
+                    plans validate every 5 minutes. Sharing your license will result in automatic suspension. We
+                    take security seriously.</div>
+            </div>
+
+            <div class="faq-item">
+                <div class="faq-q">Can I upgrade my plan later?</div>
+                <div class="faq-a">Absolutely! You can upgrade anytime by paying the <strong>difference in
+                        price</strong>. Contact support via Telegram with your current license email, and we'll
+                    handle the upgrade.</div>
+            </div>
+
+            <div class="faq-item">
+                <div class="faq-q">How do I get my license after payment?</div>
+                <div class="faq-a">After sending USDT, submit your <strong>TX hash + email</strong> via our web form
+                    or Telegram bot. We verify the transaction (usually within 5-60 minutes), then email your
+                    license key + download link.</div>
+            </div>
+
+            <div class="faq-item">
+                <div class="faq-q">What payment methods do you accept?</div>
+                <div class="faq-a"><strong>USDT (TRC20) only</strong>. We use the TRON network for fast, low-fee
+                    transactions. Send to our official wallet and submit your TX hash for verification. No credit
+                    cards or PayPal.</div>
+            </div>
+
+            <div class="faq-item">
+                <div class="faq-q">Is there a refund policy?</div>
+                <div class="faq-a"><strong>Crypto payments are final</strong> and non-refundable. That's why we
+                    offer a <strong>FREE DRY RUN demo</strong>—test the engine risk-free before buying. If you have
+                    technical issues, contact support.</div>
+            </div>
+
+            <div class="faq-item">
+                <div class="faq-q">How do I contact support?</div>
+                <div class="faq-a">Telegram is fastest: <strong>@SSB_Support</strong>. For license issues, include
+                    your email and TX hash. We typically respond within 1-6 hours.</div>
+            </div>
+
+            <div class="faq-item">
+                <div class="faq-q">What RPC nodes should I use?</div>
+                <div class="faq-a">We recommend <strong>Helius, Quicknode, or Alchemy</strong> for best performance.
+                    Cloud plans include our optimized RPC pool. Local users need to provide their own RPC endpoint.
+                </div>
+            </div>
+
+            <div class="faq-item">
+                <div class="faq-q">Does SSB work on Mac/Linux?</div>
+                <div class="faq-a">The EXE is Windows-only. However, we provide <strong>Python source code</strong>
+                    that works on Mac, Linux, and VPS. Cloud plans work on any device via web dashboard.</div>
+            </div>
+
+            <div class="faq-item">
+                <div class="faq-q">What is the AI Risk Engine?</div>
+                <div class="faq-a">Our proprietary engine scores each token 0-100 based on <strong>liquidity depth,
+                        volume spikes, holder patterns, honeypot detection, whale activity</strong>, and more. Only
+                    tokens passing your confidence threshold trigger trades.</div>
+            </div>
+
+            <div class="faq-item">
+                <div class="faq-q">Is this legal?</div>
+                <div class="faq-a">SSB is a <strong>trading automation tool</strong>. It's legal to use in most
+                    jurisdictions. However, you are responsible for complying with your local laws regarding
+                    cryptocurrency trading and taxes.</div>
+            </div>
+        </div>
+
+        <div
+            style="margin-top:20px; padding:16px; background:rgba(34,197,94,0.08); border:1px solid rgba(34,197,94,0.3); border-radius:12px; text-align:center;">
+            <div style="font-size:14px; font-weight:600; margin-bottom:8px;">🛡️ Our Commitment to You</div>
+            <div style="font-size:12px; color:var(--muted);">
+                ✓ Active development since 2023 • ✓ Regular updates with new features • ✓ Responsive Telegram
+                support • ✓ 2,000+ active traders trust SSB
+            </div>
+        </div>
+    </section>
+
+    <footer>
+        © 2025 Sol Sniper Bot PRO (SSB). All rights reserved.<br>
+        Educational use only. No profit guarantees. Crypto trading is risky.
+    </footer>
     </div>
 
     <!-- Mobile CTA -->
@@ -3282,6 +3320,39 @@
 
             document.getElementById(`tab-${tabId}`).classList.add('active');
         }
+
+        // Payment UI Logic
+        function showQRModal() {
+            document.getElementById('qr-modal').style.display = 'flex';
+        }
+
+        function closeQRModal() {
+            document.getElementById('qr-modal').style.display = 'none';
+        }
+
+        function copyWalletAddress() {
+            const wallet = "TBxck6t1a3pZE2YLho4Su1PcGKd2yK2zD4";
+            navigator.clipboard.writeText(wallet).then(() => {
+                const btn = document.querySelector('button[onclick="copyWalletAddress()"]');
+                const originalText = btn.innerHTML;
+                btn.innerHTML = "✅ Copied!";
+                btn.style.borderColor = "#4ade80";
+                setTimeout(() => {
+                    btn.innerHTML = originalText;
+                    btn.style.borderColor = "";
+                }, 2000);
+            });
+        }
+
+        // Close modal on outside click
+        document.addEventListener('DOMContentLoaded', () => {
+            const qrModal = document.getElementById('qr-modal');
+            if (qrModal) {
+                qrModal.addEventListener('click', (e) => {
+                    if (e.target.id === 'qr-modal') closeQRModal();
+                });
+            }
+        });
 
         // Mobile Menu Toggle
         function toggleMobileMenu() {
