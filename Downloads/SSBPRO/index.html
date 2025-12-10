@@ -1591,6 +1591,58 @@
             text-decoration: none;
         }
 
+        /* Hamburger Button Styles */
+        .hamburger-btn {
+            background: rgba(34, 211, 238, 0.1);
+            border: 1px solid rgba(34, 211, 238, 0.3);
+            border-radius: 8px;
+            padding: 8px 14px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: var(--accent);
+            font-size: 13px;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+
+        .hamburger-btn:hover {
+            background: rgba(34, 211, 238, 0.2);
+            border-color: var(--accent);
+            box-shadow: 0 0 20px rgba(34, 211, 238, 0.3);
+            transform: translateY(-2px);
+        }
+
+        /* Nav Link Hover Effects */
+        .nav-link {
+            position: relative;
+            color: var(--muted);
+            transition: all 0.3s;
+        }
+
+        .nav-link:hover {
+            color: var(--accent);
+            background: rgba(34, 211, 238, 0.1);
+            text-decoration: none;
+        }
+
+        .nav-link::after {
+            content: '';
+            position: absolute;
+            bottom: 2px;
+            left: 50%;
+            width: 0;
+            height: 2px;
+            background: linear-gradient(90deg, #22d3ee, #a855f7);
+            transition: all 0.3s;
+            transform: translateX(-50%);
+        }
+
+        .nav-link:hover::after {
+            width: 80%;
+        }
+
         @keyframes dropdownFade {
             from {
                 opacity: 0;
@@ -1666,7 +1718,7 @@
 
     <div class="wrapper">
         <header
-            style="position: sticky; top: 0; z-index: 1000; background: rgba(2,6,23,0.8); backdrop-filter: blur(10px); padding: 16px 0; margin-bottom: 24px; border-bottom: 1px solid rgba(255,255,255,0.05);">
+            style="position: sticky; top: 0; z-index: 1000; background: rgba(2,6,23,0.95); backdrop-filter: blur(16px); padding: 16px 0; margin-bottom: 24px; border-bottom: 1px solid rgba(255,255,255,0.08);">
             <div class="brand">
                 <div class="brand-logo">SSB</div>
                 <div>
@@ -1675,15 +1727,64 @@
                 </div>
             </div>
 
-            <!-- Desktop Nav -->
-            <div class="header-right">
+            <!-- Desktop Nav with Dropdown -->
+            <div class="header-right" style="display: flex; align-items: center; gap: 8px;">
+                <!-- Hamburger Dropdown Menu -->
+                <div class="nav-dropdown" style="margin-right: 12px;">
+                    <button class="hamburger-btn" onclick="toggleDesktopDropdown()"
+                        style="background: rgba(34, 211, 238, 0.1); border: 1px solid rgba(34, 211, 238, 0.3); border-radius: 8px; padding: 8px 12px; cursor: pointer; display: flex; align-items: center; gap: 8px; color: var(--accent); font-size: 13px; font-weight: 600; transition: all 0.3s;">
+                        <span style="font-size: 18px;">☰</span>
+                        <span>Menu</span>
+                    </button>
+                    <div class="nav-dropdown-content" id="desktopDropdown"
+                        style="display: none; right: 0; left: auto; min-width: 260px;">
+                        <div
+                            style="padding: 12px 20px; border-bottom: 1px solid rgba(255,255,255,0.1); margin-bottom: 8px;">
+                            <div
+                                style="font-size: 10px; text-transform: uppercase; letter-spacing: 0.1em; color: var(--muted);">
+                                Navigate</div>
+                        </div>
+                        <a href="#features" onclick="closeDesktopDropdown()">🚀 Features & Intelligence</a>
+                        <a href="#pricing" onclick="closeDesktopDropdown()">💰 Pricing Plans</a>
+                        <a href="#engine" onclick="closeDesktopDropdown()">⚙️ Trading Engine</a>
+                        <a href="#gui" onclick="closeDesktopDropdown()">🖥️ GUI & Cloud</a>
+                        <a href="#order" onclick="closeDesktopDropdown()">📦 Quick Checkout</a>
+                        <a href="#downloads" onclick="closeDesktopDropdown()">⬇️ Downloads</a>
+                        <a href="#faq" onclick="closeDesktopDropdown()">❓ FAQ</a>
+
+                        <div
+                            style="padding: 12px 20px; border-top: 1px solid rgba(255,255,255,0.1); border-bottom: 1px solid rgba(255,255,255,0.1); margin: 8px 0;">
+                            <div
+                                style="font-size: 10px; text-transform: uppercase; letter-spacing: 0.1em; color: var(--muted);">
+                                Pages</div>
+                        </div>
+                        <a href="dashboard.html" onclick="closeDesktopDropdown()">📊 Dashboard</a>
+                        <a href="admin.html" onclick="closeDesktopDropdown()">🔐 Admin Panel</a>
+                        <a href="auth.html" onclick="closeDesktopDropdown()">🔑 Login / Signup</a>
+
+                        <div style="padding: 12px 20px; border-top: 1px solid rgba(255,255,255,0.1); margin-top: 8px;">
+                            <div
+                                style="font-size: 10px; text-transform: uppercase; letter-spacing: 0.1em; color: var(--muted);">
+                                Support</div>
+                        </div>
+                        <a href="https://t.me/SOLSNIPERBOT_SUPPORT" target="_blank" onclick="closeDesktopDropdown()">💬
+                            Telegram Support</a>
+                        <a href="mailto:support@ssbpro.dev" onclick="closeDesktopDropdown()">📧 Email Support</a>
+                    </div>
+                </div>
+
+                <!-- Quick Links -->
                 <a href="#features"
-                    style="font-size:13px; font-weight:600; color:var(--muted); margin-right:16px;">Features</a>
+                    style="font-size:13px; font-weight:600; color:var(--muted); padding: 8px 12px; border-radius: 8px; transition: all 0.3s;"
+                    class="nav-link">Features</a>
                 <a href="#pricing"
-                    style="font-size:13px; font-weight:600; color:var(--muted); margin-right:16px;">Pricing</a>
-                <a href="#downloads"
-                    style="font-size:13px; font-weight:600; color:var(--muted); margin-right:16px;">Downloads</a>
-                <a href="auth.html" class="btn-primary" style="padding: 8px 20px; font-size: 13px;">Log In</a>
+                    style="font-size:13px; font-weight:600; color:var(--muted); padding: 8px 12px; border-radius: 8px; transition: all 0.3s;"
+                    class="nav-link">Pricing</a>
+                <a href="dashboard.html"
+                    style="font-size:13px; font-weight:600; color:var(--muted); padding: 8px 12px; border-radius: 8px; transition: all 0.3s;"
+                    class="nav-link">Dashboard</a>
+                <a href="auth.html" class="btn-primary"
+                    style="padding: 10px 24px; font-size: 13px; margin-left: 8px;">Log In</a>
             </div>
 
             <!-- Mobile Trigger -->
@@ -1693,11 +1794,28 @@
         <!-- Mobile Menu Overlay -->
         <div class="mobile-menu" id="mobileMenu">
             <button class="mobile-menu-close" onclick="toggleMobileMenu()">×</button>
-            <a href="#features" onclick="toggleMobileMenu()">Divine Features</a>
-            <a href="#pricing" onclick="toggleMobileMenu()">Pricing Plans</a>
-            <a href="#downloads" onclick="toggleMobileMenu()">Downloads</a>
-            <a href="auth.html" class="btn-primary" style="width: 80%; text-align: center;">Log In / Sign Up</a>
+
+            <div
+                style="font-size: 10px; text-transform: uppercase; letter-spacing: 0.15em; color: var(--muted); margin-bottom: 16px;">
+                Navigate</div>
+            <a href="#features" onclick="toggleMobileMenu()">🚀 Features</a>
+            <a href="#pricing" onclick="toggleMobileMenu()">💰 Pricing</a>
+            <a href="#engine" onclick="toggleMobileMenu()">⚙️ Trading Engine</a>
+            <a href="#downloads" onclick="toggleMobileMenu()">⬇️ Downloads</a>
+            <a href="#faq" onclick="toggleMobileMenu()">❓ FAQ</a>
+
+            <div
+                style="font-size: 10px; text-transform: uppercase; letter-spacing: 0.15em; color: var(--muted); margin: 24px 0 16px;">
+                Pages</div>
+            <a href="dashboard.html" onclick="toggleMobileMenu()">📊 Dashboard</a>
+            <a href="admin.html" onclick="toggleMobileMenu()">🔐 Admin Panel</a>
+
+            <div style="margin-top: 32px; width: 80%;">
+                <a href="auth.html" class="btn-primary"
+                    style="display: block; width: 100%; text-align: center; padding: 14px;">Log In / Sign Up</a>
+            </div>
         </div>
+
 
         <!-- HERO -->
         <section class="hero animate-in" style="margin-top:0; background:transparent; border:none; padding:0;">
@@ -3064,11 +3182,40 @@
             menu.classList.toggle('active');
         }
 
+        // Desktop Dropdown Toggle
+        function toggleDesktopDropdown() {
+            const dropdown = document.getElementById('desktopDropdown');
+            if (dropdown.style.display === 'none' || dropdown.style.display === '') {
+                dropdown.style.display = 'block';
+            } else {
+                dropdown.style.display = 'none';
+            }
+        }
+
+        function closeDesktopDropdown() {
+            const dropdown = document.getElementById('desktopDropdown');
+            dropdown.style.display = 'none';
+        }
+
+        // Close dropdown when clicking outside
+        document.addEventListener('click', function (event) {
+            const dropdown = document.getElementById('desktopDropdown');
+            const hamburgerBtn = document.querySelector('.hamburger-btn');
+
+            if (dropdown && hamburgerBtn) {
+                if (!hamburgerBtn.contains(event.target) && !dropdown.contains(event.target)) {
+                    dropdown.style.display = 'none';
+                }
+            }
+        });
+
         window.scrollToPayment = scrollToPayment;
         window.copyWallet = copyWallet;
         window.openTelegram = openTelegram;
         window.submitPayment = submitPayment;
         window.copyLicenseToken = copyLicenseToken;
+        window.toggleDesktopDropdown = toggleDesktopDropdown;
+        window.closeDesktopDropdown = closeDesktopDropdown;
     </script>
 </body>
 
