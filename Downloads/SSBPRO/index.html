@@ -2999,8 +2999,8 @@
             };
 
             try {
-                // Try to submit to API (if available)
-                const response = await fetch('/api/orders/web-submit', {
+                // Submit to API
+                const response = await fetch('https://api.ssbpro.dev/v1/orders/create', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify(orderData)
