@@ -38,6 +38,7 @@
             font-weight: 800;
             background: linear-gradient(90deg, #22d3ee, #a855f7);
             -webkit-background-clip: text;
+            background-clip: text;
             -webkit-text-fill-color: transparent;
             margin-bottom: 40px;
         }
@@ -240,61 +241,129 @@
 
     <div class="sidebar">
         <div class="logo">SSB CLOUD</div>
-        <a href="#" class="nav-item active">Dashboard</a>
-        <a href="#" class="nav-item">Trading Config</a>
+        <a href="#" class="nav-item active" onclick="switchTab('dashboard', this)">Dashboard</a>
+        <a href="#" class="nav-item" onclick="switchTab('wallet', this)">Wallet & RPC</a>
         <a href="#" class="nav-item">History</a>
         <a href="#" class="nav-item" onclick="logout()">Logout</a>
     </div>
 
     <div class="main">
-        <header>
-            <div>
-                <h1 style="margin:0; font-size:24px;">Command Center</h1>
-                <div style="font-size:12px; color:var(--muted); margin-top:4px;" id="user-email">...</div>
-            </div>
-            <div>
-                <span class="status-badge">
-                    <span class="status-dot"></span>
-                    ENGINE ONLINE
-                </span>
-            </div>
-        </header>
+        <!-- Dashboard View -->
+        <div id="view-dashboard">
+            <header>
+                <div>
+                    <h1 style="margin:0; font-size:24px;">Command Center</h1>
+                    <div style="font-size:12px; color:var(--muted); margin-top:4px;" id="user-email">...</div>
+                </div>
+                <div>
+                    <span class="status-badge">
+                        <span class="status-dot"></span>
+                        ENGINE ONLINE
+                    </span>
+                </div>
+            </header>
 
-        <div class="sim-toggle-wrap">
-            <div class="toggle-switch" id="sim-toggle" onclick="toggleSimulator()"></div>
-            <div style="font-size:13px; font-weight:600;">
-                <span id="sim-label">☁️ CLOUD LIVE MODE</span>
-                <span style="font-size:11px; color:var(--muted); display:block;">Switch to Dry Run / Simulator</span>
-            </div>
-        </div>
-
-        <div class="grid-3">
-            <div class="card">
-                <div class="stat-label">TODAY'S PNL</div>
-                <div class="stat-val" style="color:#4ade80;" id="stat-pnl">+$0.00</div>
-            </div>
-            <div class="card">
-                <div class="stat-label">TOKENS SCANNED</div>
-                <div class="stat-val" style="color:#22d3ee;" id="stat-scanned">0</div>
-            </div>
-            <div class="card">
-                <div class="stat-label">ACTIVE PLAN</div>
-                <div class="stat-val" id="stat-plan">...</div>
-            </div>
-        </div>
-
-        <div class="card" style="margin-bottom:24px;">
-            <div style="display:flex; justify-content:space-between; margin-bottom:16px;">
-                <h3>Live Execution Log</h3>
-                <div style="display:flex; gap:8px;">
-                    <button class="btn btn-primary" onclick="startBot()">START ENGINE</button>
-                    <button class="btn btn-danger" onclick="stopBot()">STOP</button>
+            <div class="sim-toggle-wrap">
+                <div class="toggle-switch" id="sim-toggle" onclick="toggleSimulator()"></div>
+                <div style="font-size:13px; font-weight:600;">
+                    <span id="sim-label">☁️ CLOUD LIVE MODE</span>
+                    <span style="font-size:11px; color:var(--muted); display:block;">Switch to Dry Run /
+                        Simulator</span>
                 </div>
             </div>
-            <div class="console-box" id="console">
-                <div class="log-line">[SYSTEM] Connecting to WebSocket...</div>
-                <div class="log-line">[SYSTEM] Authenticated as user.</div>
-                <div class="log-line">[ENGINE] Waiting for commands...</div>
+
+            <div class="grid-3">
+                <div class="card">
+                    <div class="stat-label">TODAY'S PNL</div>
+                    <div class="stat-val" style="color:#4ade80;" id="stat-pnl">+$0.00</div>
+                </div>
+                <div class="card">
+                    <div class="stat-label">TOKENS SCANNED</div>
+                    <div class="stat-val" style="color:#22d3ee;" id="stat-scanned">0</div>
+                </div>
+                <div class="card">
+                    <div class="stat-label">ACTIVE PLAN</div>
+                    <div class="stat-val" id="stat-plan">...</div>
+                </div>
+            </div>
+
+            <div class="card" style="margin-bottom:24px;">
+                <div style="display:flex; justify-content:space-between; margin-bottom:16px;">
+                    <h3>Live Execution Log</h3>
+                    <div style="display:flex; gap:8px;">
+                        <button class="btn btn-primary" onclick="startBot()">START ENGINE</button>
+                        <button class="btn btn-danger" onclick="stopBot()">STOP</button>
+                    </div>
+                </div>
+                <div class="console-box" id="console">
+                    <div class="log-line">[SYSTEM] Connecting to WebSocket...</div>
+                    <div class="log-line">[SYSTEM] Authenticated as user.</div>
+                    <div class="log-line">[ENGINE] Waiting for commands...</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Wallet Settings View -->
+        <div id="view-wallet" style="display:none; max-width: 800px;">
+            <header>
+                <div>
+                    <h1 style="margin:0; font-size:24px;">Wallet & Infrastructure</h1>
+                    <div style="font-size:12px; color:var(--muted); margin-top:4px;">Manage your keys and RPC
+                        connections</div>
+                </div>
+            </header>
+
+            <div class="card" style="margin-bottom: 24px; border-color: rgba(34,211,238,0.3);">
+                <h3 style="margin-top:0; color:var(--accent);">🔑 Trading Wallet</h3>
+                <p style="font-size:13px; color:var(--muted); margin-bottom:20px;">
+                    Your private key is required for the bot to sign transactions in Live Mode.
+                    It is encrypted using AES-256 before storage and never exposed to the frontend.
+                </p>
+
+                <div style="margin-bottom:16px;">
+                    <label style="font-size:12px; font-weight:600; display:block; margin-bottom:8px;">PRIVATE KEY
+                        (Base58)</label>
+                    <input type="password" id="cfg-pk" placeholder="Listening to Phantom export format..."
+                        style="width:100%; padding:12px; background:rgba(0,0,0,0.3); border:1px solid #334155; color:white; border-radius:6px; font-family:monospace;">
+                </div>
+
+                <div style="display:flex; gap:12px; align-items:center;">
+                    <button class="btn btn-primary" onclick="saveConfig()">🔒 SAVE SECURELY</button>
+                    <div id="save-status" style="font-size:12px; display:none;"></div>
+                </div>
+
+                <div style="margin-top:24px; padding:16px; background:rgba(255,255,255,0.03); border-radius:8px;">
+                    <div
+                        style="font-size:11px; text-transform:uppercase; letter-spacing:1px; color:var(--muted); margin-bottom:8px;">
+                        Current Status</div>
+                    <div style="font-display:flex; justify-content:space-between; align-items:center;">
+                        <div>
+                            <div style="font-size:12px; color:var(--muted);">Wallet Address</div>
+                            <div style="font-family:monospace; color:var(--text);" id="wallet-address-display">Not
+                                Configured</div>
+                        </div>
+                        <div style="text-align:right;">
+                            <div style="font-size:12px; color:var(--muted);">Balance</div>
+                            <div style="font-weight:700; color:#4ade80;" id="wallet-balance-display">-- SOL</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card">
+                <h3 style="margin-top:0; color:#a855f7;">⚡ RPC Configuration</h3>
+                <p style="font-size:13px; color:var(--muted); margin-bottom:20px;">
+                    Override default cloud RPCs with your own high-speed endpoints (Helius, Triton, QuickNode).
+                </p>
+
+                <div style="margin-bottom:16px;">
+                    <label style="font-size:12px; font-weight:600; display:block; margin-bottom:8px;">CUSTOM RPC URL
+                        (HTTPs)</label>
+                    <input type="text" id="cfg-rpc" placeholder="https://mainnet.helius-rpc.com/..."
+                        style="width:100%; padding:12px; background:rgba(0,0,0,0.3); border:1px solid #334155; color:white; border-radius:6px; font-family:monospace;">
+                </div>
+
+                <button class="btn" onclick="saveConfig()" style="background:#334155; color:white;">UPDATE RPC</button>
             </div>
         </div>
     </div>
@@ -407,6 +476,68 @@
         function logout() {
             localStorage.removeItem('ssb_token');
             window.location.href = '/auth.html';
+        }
+
+        // Tab Switching
+        function switchTab(viewId, link) {
+            // Hide all views
+            document.getElementById('view-dashboard').style.display = 'none';
+            document.getElementById('view-wallet').style.display = 'none';
+
+            // Show selected
+            document.getElementById('view-' + viewId).style.display = 'block';
+
+            // Update nav
+            document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
+            link.classList.add('active');
+        }
+
+        // Configuration
+        async function saveConfig() {
+            const pk = document.getElementById('cfg-pk').value.trim();
+            const rpc = document.getElementById('cfg-rpc').value.trim();
+            const statusEl = document.getElementById('save-status');
+
+            if (!pk && !rpc) return;
+
+            statusEl.style.display = 'block';
+            statusEl.style.color = 'var(--accent)';
+            statusEl.innerHTML = '⏳ Encrypting & Saving...';
+
+            const token = localStorage.getItem('ssb_token');
+
+            try {
+                const res = await fetch(`${API}/bot/config`, {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        private_key: pk,
+                        rpc_url: rpc
+                    })
+                });
+
+                const data = await res.json();
+
+                if (data.success) {
+                    statusEl.innerHTML = '✅ Saved Securely';
+                    statusEl.style.color = '#4ade80';
+                    document.getElementById('cfg-pk').value = ''; // Clear for security
+                    if (data.address) {
+                        document.getElementById('wallet-address-display').innerText = data.address;
+                        document.getElementById('wallet-balance-display').innerText = data.balance + ' SOL';
+                    }
+                } else {
+                    statusEl.innerHTML = '❌ Error: ' + data.detail;
+                    statusEl.style.color = '#f87171';
+                }
+            } catch (e) {
+                console.error(e);
+                statusEl.innerHTML = '❌ Connection Error';
+                statusEl.style.color = '#f87171';
+            }
         }
 
         window.onload = init;
