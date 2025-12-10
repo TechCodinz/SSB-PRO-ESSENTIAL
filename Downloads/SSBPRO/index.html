@@ -1249,6 +1249,66 @@
             color: var(--muted);
             margin-top: 4px;
         }
+
+        /* Mobile Menu */
+        .mobile-menu-btn {
+            display: none;
+            background: none;
+            border: none;
+            font-size: 28px;
+            color: var(--text);
+            cursor: pointer;
+            z-index: 2000;
+        }
+
+        .mobile-menu {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100vh;
+            background: rgba(2, 6, 23, 0.98);
+            backdrop-filter: blur(16px);
+            z-index: 1500;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 32px;
+            transform: translateX(100%);
+            transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .mobile-menu.active {
+            transform: translateX(0);
+        }
+
+        .mobile-menu a {
+            font-size: 22px;
+            font-weight: 700;
+            color: var(--text);
+        }
+
+        .mobile-menu-close {
+            position: absolute;
+            top: 24px;
+            right: 24px;
+            background: none;
+            border: none;
+            font-size: 32px;
+            color: var(--muted);
+            cursor: pointer;
+        }
+
+        @media (max-width: 900px) {
+            .mobile-menu-btn {
+                display: block;
+            }
+
+            .header-right {
+                display: none;
+            }
+        }
     </style>
 </head>
 
@@ -1256,7 +1316,8 @@
     <div class="particles" id="particles"></div>
 
     <div class="wrapper">
-        <header>
+        <header
+            style="position: sticky; top: 0; z-index: 1000; background: rgba(2,6,23,0.8); backdrop-filter: blur(10px); padding: 16px 0; margin-bottom: 24px; border-bottom: 1px solid rgba(255,255,255,0.05);">
             <div class="brand">
                 <div class="brand-logo">SSB</div>
                 <div>
@@ -1264,14 +1325,30 @@
                     <div class="brand-text-sub">Cloud Edition • 2025</div>
                 </div>
             </div>
+
+            <!-- Desktop Nav -->
             <div class="header-right">
-                <div class="tag-pill">
-                    <span class="tag-dot"></span>
-                    Live Engine • AI Risk v3 • Cloud Connected
-                </div>
-                <div id="ref-pill" class="ref-pill"></div>
+                <a href="#features"
+                    style="font-size:13px; font-weight:600; color:var(--muted); margin-right:16px;">Features</a>
+                <a href="#pricing"
+                    style="font-size:13px; font-weight:600; color:var(--muted); margin-right:16px;">Pricing</a>
+                <a href="#downloads"
+                    style="font-size:13px; font-weight:600; color:var(--muted); margin-right:16px;">Downloads</a>
+                <a href="auth.html" class="btn-primary" style="padding: 8px 20px; font-size: 13px;">Log In</a>
             </div>
+
+            <!-- Mobile Trigger -->
+            <button class="mobile-menu-btn" onclick="toggleMobileMenu()">☰</button>
         </header>
+
+        <!-- Mobile Menu Overlay -->
+        <div class="mobile-menu" id="mobileMenu">
+            <button class="mobile-menu-close" onclick="toggleMobileMenu()">×</button>
+            <a href="#features" onclick="toggleMobileMenu()">Divine Features</a>
+            <a href="#pricing" onclick="toggleMobileMenu()">Pricing Plans</a>
+            <a href="#downloads" onclick="toggleMobileMenu()">Downloads</a>
+            <a href="auth.html" class="btn-primary" style="width: 80%; text-align: center;">Log In / Sign Up</a>
+        </div>
 
         <!-- HERO -->
         <section class="hero animate-in" style="margin-top:0; background:transparent; border:none; padding:0;">
@@ -2516,6 +2593,12 @@
             navigator.clipboard?.writeText(token).then(() => {
                 alert('✅ License token copied!');
             }).catch(() => alert(token));
+        }
+
+        // Mobile Menu Toggle
+        function toggleMobileMenu() {
+            const menu = document.getElementById('mobileMenu');
+            menu.classList.toggle('active');
         }
 
         window.scrollToPayment = scrollToPayment;
