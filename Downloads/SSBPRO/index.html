@@ -463,14 +463,14 @@
 
         .header-right {
             display: flex;
-            flex-direction: column;
-            align-items: flex-end;
-            gap: 8px;
+            flex-direction: row;
+            align-items: center;
+            gap: 6px;
         }
 
-        @media (max-width: 640px) {
+        @media (max-width: 900px) {
             .header-right {
-                align-items: flex-start;
+                display: none;
             }
         }
 
@@ -1727,65 +1727,16 @@
                 </div>
             </div>
 
-            <!-- Desktop Nav with Dropdown -->
-            <div class="header-right" style="display: flex; align-items: center; gap: 8px;">
-                <!-- Hamburger Dropdown Menu -->
-                <div class="nav-dropdown" style="margin-right: 12px;">
-                    <button class="hamburger-btn" onclick="toggleDesktopDropdown()"
-                        style="background: rgba(34, 211, 238, 0.1); border: 1px solid rgba(34, 211, 238, 0.3); border-radius: 8px; padding: 8px 12px; cursor: pointer; display: flex; align-items: center; gap: 8px; color: var(--accent); font-size: 13px; font-weight: 600; transition: all 0.3s;">
-                        <span style="font-size: 18px;">☰</span>
-                        <span>Menu</span>
-                    </button>
-                    <div class="nav-dropdown-content" id="desktopDropdown"
-                        style="display: none; right: 0; left: auto; min-width: 260px;">
-                        <div
-                            style="padding: 12px 20px; border-bottom: 1px solid rgba(255,255,255,0.1); margin-bottom: 8px;">
-                            <div
-                                style="font-size: 10px; text-transform: uppercase; letter-spacing: 0.1em; color: var(--muted);">
-                                Navigate</div>
-                        </div>
-                        <a href="#features" onclick="closeDesktopDropdown()">🚀 Features & Intelligence</a>
-                        <a href="#pricing" onclick="closeDesktopDropdown()">💰 Pricing Plans</a>
-                        <a href="#engine" onclick="closeDesktopDropdown()">⚙️ Trading Engine</a>
-                        <a href="#gui" onclick="closeDesktopDropdown()">🖥️ GUI & Cloud</a>
-                        <a href="#order" onclick="closeDesktopDropdown()">📦 Quick Checkout</a>
-                        <a href="#downloads" onclick="closeDesktopDropdown()">⬇️ Downloads</a>
-                        <a href="#faq" onclick="closeDesktopDropdown()">❓ FAQ</a>
-
-                        <div
-                            style="padding: 12px 20px; border-top: 1px solid rgba(255,255,255,0.1); border-bottom: 1px solid rgba(255,255,255,0.1); margin: 8px 0;">
-                            <div
-                                style="font-size: 10px; text-transform: uppercase; letter-spacing: 0.1em; color: var(--muted);">
-                                Pages</div>
-                        </div>
-                        <a href="dashboard.html" onclick="closeDesktopDropdown()">📊 Dashboard</a>
-                        <a href="admin.html" onclick="closeDesktopDropdown()">🔐 Admin Panel</a>
-                        <a href="auth.html" onclick="closeDesktopDropdown()">🔑 Login / Signup</a>
-
-                        <div style="padding: 12px 20px; border-top: 1px solid rgba(255,255,255,0.1); margin-top: 8px;">
-                            <div
-                                style="font-size: 10px; text-transform: uppercase; letter-spacing: 0.1em; color: var(--muted);">
-                                Support</div>
-                        </div>
-                        <a href="https://t.me/SOLSNIPERBOT_SUPPORT" target="_blank" onclick="closeDesktopDropdown()">💬
-                            Telegram Support</a>
-                        <a href="mailto:support@ssbpro.dev" onclick="closeDesktopDropdown()">📧 Email Support</a>
-                    </div>
-                </div>
-
-                <!-- Quick Links -->
-                <a href="#features"
-                    style="font-size:13px; font-weight:600; color:var(--muted); padding: 8px 12px; border-radius: 8px; transition: all 0.3s;"
-                    class="nav-link">Features</a>
-                <a href="#pricing"
-                    style="font-size:13px; font-weight:600; color:var(--muted); padding: 8px 12px; border-radius: 8px; transition: all 0.3s;"
-                    class="nav-link">Pricing</a>
-                <a href="dashboard.html"
-                    style="font-size:13px; font-weight:600; color:var(--muted); padding: 8px 12px; border-radius: 8px; transition: all 0.3s;"
-                    class="nav-link">Dashboard</a>
+            <!-- Desktop Navigation -->
+            <nav class="header-right">
+                <a href="#features" class="nav-link">Features</a>
+                <a href="#pricing" class="nav-link">Pricing</a>
+                <a href="#engine" class="nav-link">Engine</a>
+                <a href="#downloads" class="nav-link">Downloads</a>
+                <a href="dashboard.html" class="nav-link">Dashboard</a>
                 <a href="auth.html" class="btn-primary"
-                    style="padding: 10px 24px; font-size: 13px; margin-left: 8px;">Log In</a>
-            </div>
+                    style="padding: 10px 24px; font-size: 13px; margin-left: 12px;">Log In</a>
+            </nav>
 
             <!-- Mobile Trigger -->
             <button class="mobile-menu-btn" onclick="toggleMobileMenu()">☰</button>
