@@ -176,6 +176,60 @@
             align-items: center;
             justify-content: center;
         }
+
+        /* Simulator Toggle */
+        .sim-toggle-wrap {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 24px;
+            background: rgba(34, 211, 238, 0.05);
+            padding: 10px 16px;
+            border-radius: 999px;
+            border: 1px solid rgba(34, 211, 238, 0.2);
+        }
+
+        .toggle-switch {
+            position: relative;
+            width: 44px;
+            height: 24px;
+            background: #334155;
+            border-radius: 999px;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        .toggle-switch::after {
+            content: '';
+            position: absolute;
+            left: 2px;
+            top: 2px;
+            width: 20px;
+            height: 20px;
+            background: #fff;
+            border-radius: 50%;
+            transition: 0.3s;
+        }
+
+        .toggle-active {
+            background: #22c55e;
+        }
+
+        .toggle-active::after {
+            transform: translateX(20px);
+        }
+
+        /* Matrix Mode */
+        body.sim-mode {
+            --accent: #4ade80;
+            --text: #dcfce7;
+        }
+
+        body.sim-mode .logo {
+            background: linear-gradient(90deg, #4ade80, #22c55e);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
     </style>
 </head>
 
@@ -206,6 +260,14 @@
             </div>
         </header>
 
+        <div class="sim-toggle-wrap">
+            <div class="toggle-switch" id="sim-toggle" onclick="toggleSimulator()"></div>
+            <div style="font-size:13px; font-weight:600;">
+                <span id="sim-label">☁️ CLOUD LIVE MODE</span>
+                <span style="font-size:11px; color:var(--muted); display:block;">Switch to Dry Run / Simulator</span>
+            </div>
+        </div>
+
         <div class="grid-3">
             <div class="card">
                 <div class="stat-label">TODAY'S PNL</div>
@@ -225,8 +287,8 @@
             <div style="display:flex; justify-content:space-between; margin-bottom:16px;">
                 <h3>Live Execution Log</h3>
                 <div style="display:flex; gap:8px;">
-                    <button class="btn btn-primary">START BOT</button>
-                    <button class="btn btn-danger">STOP</button>
+                    <button class="btn btn-primary" onclick="startBot()">START ENGINE</button>
+                    <button class="btn btn-danger" onclick="stopBot()">STOP</button>
                 </div>
             </div>
             <div class="console-box" id="console">
@@ -268,6 +330,78 @@
             } catch (e) {
                 console.error(e);
             }
+        }
+
+        // Simulation Logic
+        let isSimMode = false;
+        let pollInterval = null;
+
+        function toggleSimulator() {
+            isSimMode = !isSimMode;
+            document.body.classList.toggle('sim-mode');
+            const toggle = document.getElementById('sim-toggle');
+            toggle.classList.toggle('toggle-active');
+
+            const label = document.getElementById('sim-label');
+            if (isSimMode) {
+                label.innerHTML = "🧪 SIMULATOR MODE (Dry Run)";
+                document.getElementById('stat-plan').innerText = "UNLIMITED (DEV)";
+                startPollingSim();
+            } else {
+                label.innerHTML = "☁️ CLOUD LIVE MODE";
+                location.reload(); // Reset to live state
+            }
+        }
+
+        async function startBot() {
+            if (isSimMode) {
+                await fetch(`${API}/simulation/start`, { method: 'POST' });
+                log("Executing Dry Run on Neural Engine...");
+            } else {
+                alert("Live trading engine requires active Cloud subscription.");
+            }
+        }
+
+        async function stopBot() {
+            if (isSimMode) {
+                await fetch(`${API}/simulation/stop`, { method: 'POST' });
+                log("Stopping Simulation...");
+            }
+        }
+
+        function startPollingSim() {
+            if (pollInterval) clearInterval(pollInterval);
+            pollInterval = setInterval(async () => {
+                if (!isSimMode) return;
+                try {
+                    const res = await fetch(`${API}/simulation/state`);
+                    const data = await res.json();
+
+                    if (data.is_running) {
+                        document.getElementById('stat-pnl').innerText = `+${data.total_pnl.toFixed(4)} SOL`;
+                        document.getElementById('stat-scanned').innerText = data.tokens_scanned;
+
+                        // Update Logs
+                        const consoleBox = document.getElementById('console');
+                        consoleBox.innerHTML = ""; // Clear for demo stream effect
+                        data.recent_logs.forEach(msg => {
+                            const d = document.createElement('div');
+                            d.className = 'log-line';
+                            d.innerHTML = msg;
+                            consoleBox.appendChild(d);
+                        });
+                        consoleBox.scrollTop = consoleBox.scrollHeight;
+                    }
+                } catch (e) { console.error(e); }
+            }, 1000); // 1s poll rate
+        }
+
+        function log(msg) {
+            const consoleBox = document.getElementById('console');
+            const d = document.createElement('div');
+            d.className = 'log-line';
+            d.innerText = `[SYSTEM] ${msg}`;
+            consoleBox.appendChild(d);
         }
 
         function logout() {
