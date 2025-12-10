@@ -1250,6 +1250,58 @@
             margin-top: 4px;
         }
 
+        /* Premium Tabs */
+        .features-tabs {
+            display: flex;
+            justify-content: center;
+            gap: 12px;
+            margin-bottom: 32px;
+            flex-wrap: wrap;
+        }
+
+        .tab-btn {
+            background: rgba(15, 23, 42, 0.6);
+            border: 1px solid rgba(55, 65, 81, 0.6);
+            padding: 10px 24px;
+            border-radius: 999px;
+            color: var(--muted);
+            cursor: pointer;
+            font-size: 13px;
+            font-weight: 600;
+            transition: all 0.3s;
+            backdrop-filter: blur(10px);
+        }
+
+        .tab-btn:hover {
+            background: rgba(34, 211, 238, 0.1);
+            color: var(--text);
+            border-color: rgba(34, 211, 238, 0.3);
+        }
+
+        .tab-btn.active {
+            background: linear-gradient(135deg, rgba(34, 211, 238, 0.2), rgba(168, 85, 247, 0.2));
+            border-color: var(--accent);
+            color: #fff;
+            box-shadow: 0 0 20px rgba(34, 211, 238, 0.3);
+        }
+
+        .tab-content {
+            display: none;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 16px;
+            animation: fadeInSection 0.5s ease-out;
+        }
+
+        @media (max-width: 900px) {
+            .tab-content {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .tab-content.active {
+            display: grid;
+        }
+
         /* Mobile Menu */
         .mobile-menu-btn {
             display: none;
@@ -1432,90 +1484,116 @@
         </section>
 
 
-        <!-- 🌟 DIVINE FEATURES - MIND-BLOWING CAPABILITIES -->
+        <!-- 🌟 PREMIUM TABBED FEATURES -->
         <section id="divine-features"
-            style="background: linear-gradient(145deg, rgba(168,85,247,0.08), rgba(15,23,42,0.98)); border-color: rgba(168,85,247,0.3);">
-            <h2>🌟 Divine Features™ – Mind-Blowing Trading Intelligence</h2>
-            <p>These aren't just features – they're <strong>trading superpowers</strong> that put you leagues ahead of
-                manual traders. Available on PRO and ELITE tiers.</p>
+            style="background: linear-gradient(145deg, rgba(168,85,247,0.05), rgba(15,23,42,0.98)); border-top: 1px solid rgba(168,85,247,0.2);">
 
-            <div style="display:grid; grid-template-columns: repeat(3, 1fr); gap:16px; margin-top:20px;">
-                <!-- AI Sentiment -->
-                <div class="price-card" style="background:rgba(0,0,0,0.3);">
-                    <div style="font-size:28px; margin-bottom:8px;">🧠</div>
-                    <div style="font-size:15px; font-weight:700; margin-bottom:6px;">AI Sentiment Engine</div>
-                    <p style="font-size:12px; color:var(--muted);">
-                        Real-time social sentiment analysis. Tracks bullish/bearish keywords, viral velocity, and
-                        calculates a <strong>Fear & Greed Index</strong> for each token. Know the mood before you buy.
+            <div style="text-align:center; margin-bottom:40px;">
+                <h2 style="font-size:32px; margin-bottom:12px;">🌟 Divine Intelligence™</h2>
+                <p style="color:var(--muted); max-width:600px; margin:0 auto;">
+                    Engineered for dominance. Select a module to explore our advanced capabilities.
+                </p>
+            </div>
+
+            <div class="features-tabs">
+                <button class="tab-btn active" onclick="switchTab('intelligence')">🧠 AI Intelligence</button>
+                <button class="tab-btn" onclick="switchTab('protection')">🛡️ Divine Protection</button>
+                <button class="tab-btn" onclick="switchTab('cloud')">☁️ Cloud Power</button>
+            </div>
+
+            <!-- Intelligence Tab -->
+            <div id="tab-intelligence" class="tab-content active">
+                <div class="price-card" style="background:rgba(0,0,0,0.4);">
+                    <div style="font-size:32px; margin-bottom:12px;">🧠</div>
+                    <div style="font-size:16px; font-weight:700; margin-bottom:8px; color:#fff;">AI Sentiment Engine
+                    </div>
+                    <p style="font-size:13px; color:var(--muted); line-height:1.6;">
+                        Analyzes 50,000+ social signals/sec. Tracks viral velocity and calculates a real-time
+                        <strong>Fear & Greed Index</strong> for every token.
                     </p>
                 </div>
-
-                <!-- Momentum Cascade -->
-                <div class="price-card" style="background:rgba(0,0,0,0.3);">
-                    <div style="font-size:28px; margin-bottom:8px;">⚡</div>
-                    <div style="font-size:15px; font-weight:700; margin-bottom:6px;">Momentum Cascade Detection</div>
-                    <p style="font-size:12px; color:var(--muted);">
-                        Detects when 5+ signals align: volume spike, whale buy, holder surge, social explosion,
-                        liquidity add, bot exodus, pattern match, time alignment. <strong>When these converge =
-                            explosive moves.</strong>
+                <div class="price-card" style="background:rgba(0,0,0,0.4);">
+                    <div style="font-size:32px; margin-bottom:12px;">⚡</div>
+                    <div style="font-size:16px; font-weight:700; margin-bottom:8px; color:#fff;">Momentum Cascade</div>
+                    <p style="font-size:13px; color:var(--muted); line-height:1.6;">
+                        Only buys when 5 signals converge: Volume + Whales + Holders + Socials + Liquidity. <strong>The
+                            perfect entry.</strong>
                     </p>
                 </div>
-
-                <!-- Smart Money -->
-                <div class="price-card" style="background:rgba(0,0,0,0.3);">
-                    <div style="font-size:28px; margin-bottom:8px;">🐋</div>
-                    <div style="font-size:15px; font-weight:700; margin-bottom:6px;">Smart Money Tracker</div>
-                    <p style="font-size:12px; color:var(--muted);">
-                        Follow the whales! Track known profitable wallets and get alerts when they make moves.
-                        <strong>Copy their trades for higher win rates.</strong> Whale confidence boost on signals.
-                    </p>
-                </div>
-
-                <!-- Signal Tiers -->
-                <div class="price-card" style="background:rgba(0,0,0,0.3);">
-                    <div style="font-size:28px; margin-bottom:8px;">🌟</div>
-                    <div style="font-size:15px; font-weight:700; margin-bottom:6px;">Signal Strength Tiers</div>
-                    <p style="font-size:12px; color:var(--muted);">
-                        🌟 <strong>LEGENDARY</strong> (95%+) – Generational plays<br>
-                        🔥 <strong>ULTRA</strong> (88%+) – High conviction<br>
-                        💪 <strong>STRONG</strong> (78%+) – Solid setups<br>
-                        📊 MODERATE (65%+) – Worth watching
-                    </p>
-                </div>
-
-                <!-- Divine Protection -->
-                <div class="price-card" style="background:rgba(0,0,0,0.3);">
-                    <div style="font-size:28px; margin-bottom:8px;">🛡️</div>
-                    <div style="font-size:15px; font-weight:700; margin-bottom:6px;">Divine Protection System</div>
-                    <p style="font-size:12px; color:var(--muted);">
-                        Multi-layer threat detection: honeypot analysis, liquidity drain alerts, freeze authority
-                        blocking, smart sell retry logic, and <strong>Turbo Priority Fees</strong> for fast exits.
-                    </p>
-                </div>
-
-                <!-- Gamification -->
-                <div class="price-card" style="background:rgba(0,0,0,0.3);">
-                    <div style="font-size:28px; margin-bottom:8px;">🏆</div>
-                    <div style="font-size:15px; font-weight:700; margin-bottom:6px;">Gamification & XP</div>
-                    <p style="font-size:12px; color:var(--muted);">
-                        Earn XP for profitable trades, unlock achievements, level up your trader profile. <strong>Makes
-                            trading fun and rewarding.</strong> Daily summaries with stats.
+                <div class="price-card" style="background:rgba(0,0,0,0.4);">
+                    <div style="font-size:32px; margin-bottom:12px;">🐋</div>
+                    <div style="font-size:16px; font-weight:700; margin-bottom:8px; color:#fff;">Smart Money Tracker
+                    </div>
+                    <p style="font-size:13px; color:var(--muted); line-height:1.6;">
+                        Automatically copies profitable wallets. Alerts you when "God Tier" whales enter a trade.
                     </p>
                 </div>
             </div>
 
-            <div
-                style="margin-top:20px; padding:16px; background:rgba(34,211,238,0.08); border:1px solid rgba(34,211,238,0.3); border-radius:14px;">
-                <div style="font-size:14px; font-weight:700; margin-bottom:8px;">✨ Only on CLOUD SNIPER ELITE:</div>
-                <div style="display:flex; gap:16px; flex-wrap:wrap; font-size:12px; color:var(--muted);">
-                    <span>🚀 Auto-Compound Profits</span>
-                    <span>📈 Market Regime Detection</span>
-                    <span>⚡ Priority Cloud Queue</span>
-                    <span>🐋 Whale Alert Notifications</span>
-                    <span>🌟 Legendary Signal Alerts</span>
-                    <span>📊 Daily Trading Summaries</span>
+            <!-- Protection Tab -->
+            <div id="tab-protection" class="tab-content">
+                <div class="price-card" style="background:rgba(0,0,0,0.4);">
+                    <div style="font-size:32px; margin-bottom:12px;">🛡️</div>
+                    <div style="font-size:16px; font-weight:700; margin-bottom:8px; color:#fff;">Anti-Rug Shield</div>
+                    <p style="font-size:13px; color:var(--muted); line-height:1.6;">
+                        Blocks honeypots, mint-authority exploits, and liquidity drains instantly.
+                    </p>
+                </div>
+                <div class="price-card" style="background:rgba(0,0,0,0.4);">
+                    <div style="font-size:32px; margin-bottom:12px;">🔒</div>
+                    <div style="font-size:16px; font-weight:700; margin-bottom:8px; color:#fff;">Freeze Blocking</div>
+                    <p style="font-size:13px; color:var(--muted); line-height:1.6;">
+                        Detects "Freeze Authority" risks before you buy. Never get your tokens locked again.
+                    </p>
+                </div>
+                <div class="price-card" style="background:rgba(0,0,0,0.4);">
+                    <div style="font-size:32px; margin-bottom:12px;">🚄</div>
+                    <div style="font-size:16px; font-weight:700; margin-bottom:8px; color:#fff;">Turbo Priority</div>
+                    <p style="font-size:13px; color:var(--muted); line-height:1.6;">
+                        Smart bribing logic ensures your sell tx lands even during extreme network congestion.
+                    </p>
                 </div>
             </div>
+
+            <!-- Cloud Tab -->
+            <div id="tab-cloud" class="tab-content">
+                <div class="price-card" style="background:rgba(0,0,0,0.4);">
+                    <div style="font-size:32px; margin-bottom:12px;">☁️</div>
+                    <div style="font-size:16px; font-weight:700; margin-bottom:8px; color:#fff;">24/7 Autonomy</div>
+                    <p style="font-size:13px; color:var(--muted); line-height:1.6;">
+                        Runs on our high-speed VPS nodes. No need to keep your PC on. Trades while you sleep.
+                    </p>
+                </div>
+                <div class="price-card" style="background:rgba(0,0,0,0.4);">
+                    <div style="font-size:32px; margin-bottom:12px;">📱</div>
+                    <div style="font-size:16px; font-weight:700; margin-bottom:8px; color:#fff;">Mobile Command</div>
+                    <p style="font-size:13px; color:var(--muted); line-height:1.6;">
+                        Control everything from your phone. Start/Stop bot, view PnL, and withdraw funds.
+                    </p>
+                </div>
+                <div class="price-card" style="background:rgba(0,0,0,0.4);">
+                    <div style="font-size:32px; margin-bottom:12px;">🧪</div>
+                    <div style="font-size:16px; font-weight:700; margin-bottom:8px; color:#fff;">Dry Run Simulator</div>
+                    <p style="font-size:13px; color:var(--muted); line-height:1.6;">
+                        Test your strategies with our "Matrix Mode" simulator before risking real SOL.
+                    </p>
+                </div>
+            </div>
+
+        </section>
+
+        <div
+            style="margin-top:20px; padding:16px; background:rgba(34,211,238,0.08); border:1px solid rgba(34,211,238,0.3); border-radius:14px;">
+            <div style="font-size:14px; font-weight:700; margin-bottom:8px;">✨ Only on CLOUD SNIPER ELITE:</div>
+            <div style="display:flex; gap:16px; flex-wrap:wrap; font-size:12px; color:var(--muted);">
+                <span>🚀 Auto-Compound Profits</span>
+                <span>📈 Market Regime Detection</span>
+                <span>⚡ Priority Cloud Queue</span>
+                <span>🐋 Whale Alert Notifications</span>
+                <span>🌟 Legendary Signal Alerts</span>
+                <span>📊 Daily Trading Summaries</span>
+            </div>
+        </div>
         </section>
 
 
@@ -2593,6 +2671,22 @@
             navigator.clipboard?.writeText(token).then(() => {
                 alert('✅ License token copied!');
             }).catch(() => alert(token));
+        }
+
+        // Tab Logic
+        function switchTab(tabId) {
+            // Remove active class from all buttons and tabs
+            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+
+            // Add active class to clicked button and target tab
+            // Use event.target or find by text content/index if needed, but for now assuming simple match
+            const buttons = document.querySelectorAll('.tab-btn');
+            if (tabId === 'intelligence') buttons[0].classList.add('active');
+            if (tabId === 'protection') buttons[1].classList.add('active');
+            if (tabId === 'cloud') buttons[2].classList.add('active');
+
+            document.getElementById(`tab-${tabId}`).classList.add('active');
         }
 
         // Mobile Menu Toggle
