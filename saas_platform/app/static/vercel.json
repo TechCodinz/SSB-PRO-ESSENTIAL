@@ -1,0 +1,18 @@
+{
+    "rewrites": [
+        {
+            "source": "/",
+            "has": [
+                {
+                    "type": "host",
+                    "value": "app.ssbpro.dev"
+                }
+            ],
+            "destination": "/dashboard.html"
+        },
+        {
+            "source": "/auth",
+            "destination": "/auth.html"
+        }
+    ]
+}
