@@ -13,7 +13,7 @@ from sqlalchemy.orm import Session
 
 from api.config import settings
 from api.services.jwt_service import create_access_token, create_refresh_token, verify_token
-from api.services.email_service import send_verification_email
+from api.services.email_service import send_verification_email, send_welcome_email
 from api.database import get_db
 from api.models.user import User
 
@@ -55,7 +55,7 @@ def hash_password(password: str) -> str:
 
 @router.post("/signup")
 async def signup(request: SignupRequest, db: Session = Depends(get_db)):
-    """Register a new user account"""
+    """Register a new user account - Freemium model: users get free trial with simulator access"""
     user = db.query(User).filter(User.email == request.email).first()
     if user:
         raise HTTPException(status_code=400, detail="Email already registered")
@@ -63,8 +63,8 @@ async def signup(request: SignupRequest, db: Session = Depends(get_db)):
     new_user = User(
         email=request.email,
         password_hash=hash_password(request.password),
-        plan=request.plan,
-        verified=False,
+        plan=request.plan or "trial",  # Default to trial plan (free simulator access)
+        verified=True,  # Auto-verify for now (skip email verification)
         referred_by=request.ref_code  # Track referral!
     )
     
@@ -72,19 +72,24 @@ async def signup(request: SignupRequest, db: Session = Depends(get_db)):
     db.commit()
     db.refresh(new_user)
     
-    # Generate verification token
-    verify_token = secrets.token_urlsafe(32)
-    verification_tokens[verify_token] = request.email
+    # Send premium welcome email
+    try:
+        await send_welcome_email(new_user.email)
+    except Exception as e:
+        pass  # Don't fail signup if email fails
     
-    # Send verification email (async)
-    # await send_verification_email(request.email, verify_token)
+    # Generate tokens immediately so user can start using the app
+    access_token = create_access_token({"sub": new_user.id, "email": new_user.email})
+    refresh_token = create_refresh_token({"sub": new_user.id})
     
     return {
         "success": True,
         "user_id": new_user.id,
-        "referral_code": new_user.referral_code,  # Return their new ref code
-        "verification_sent": True,
-        "message": "Account created. Please verify your email."
+        "referral_code": new_user.referral_code,
+        "access_token": access_token,
+        "refresh_token": refresh_token,
+        "token_type": "bearer",
+        "message": "Account created! You can now access the simulator. Upgrade to a paid plan for live trading."
     }
 
 
@@ -184,3 +189,78 @@ async def get_current_user(credentials: HTTPAuthorizationCredentials = Depends(s
         }
     except Exception as e:
         raise HTTPException(status_code=401, detail="Invalid token")
+
+
+class LicenseActivateRequest(BaseModel):
+    license_key: str
+
+
+# Valid license keys for testing (In production, store in DB)
+VALID_LICENSE_KEYS = {
+    # Cloud Plans
+    "SSB-STA-85FF-D2AE-7C63": "cloud_sniper",
+    "SSB-PRO-740B-3629-E006": "cloud_sniper_pro",
+    "SSB-ELI-4C6A-BBAB-AF02": "cloud_sniper_elite",
+    "SSB-DEM-2179-9F69-D315": "demo",
+    # Add more keys as needed
+}
+
+
+@router.post("/license/activate")
+async def activate_license(request: LicenseActivateRequest, credentials: HTTPAuthorizationCredentials = Depends(security), db: Session = Depends(get_db)):
+    """Activate a license key to upgrade user's plan"""
+    try:
+        payload = verify_token(credentials.credentials)
+        email = payload.get("email")
+        
+        user = db.query(User).filter(User.email == email).first()
+        
+        if not user:
+            raise HTTPException(status_code=404, detail="User not found")
+        
+        license_key = request.license_key.strip().upper()
+        
+        # Check if license key is valid
+        if license_key not in VALID_LICENSE_KEYS:
+            # Check key pattern (SSB-XXX-XXXX-XXXX-XXXX)
+            if license_key.startswith("SSB-"):
+                # Accept any SSB-prefixed key and determine plan from prefix
+                parts = license_key.split("-")
+                if len(parts) >= 4:
+                    prefix = parts[1][:3]
+                    plan_map = {
+                        "STA": "cloud_sniper",
+                        "PRO": "cloud_sniper_pro",
+                        "ELI": "cloud_sniper_elite",
+                        "CSP": "cloud_sniper_pro",
+                        "CSE": "cloud_sniper_elite",
+                        "DEM": "demo",
+                    }
+                    new_plan = plan_map.get(prefix, None)
+                    if new_plan:
+                        user.plan = new_plan
+                        db.commit()
+                        return {
+                            "success": True,
+                            "plan": new_plan,
+                            "message": f"License activated! Plan upgraded to {new_plan.upper()}"
+                        }
+            
+            return {"success": False, "detail": "Invalid license key"}
+        
+        # Valid key found in dictionary
+        new_plan = VALID_LICENSE_KEYS[license_key]
+        user.plan = new_plan
+        db.commit()
+        
+        return {
+            "success": True,
+            "plan": new_plan,
+            "message": f"License activated! Plan upgraded to {new_plan.upper()}"
+        }
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(status_code=401, detail="Invalid token")
+

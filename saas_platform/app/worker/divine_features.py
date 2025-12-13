@@ -549,74 +549,81 @@ class DivineProtectionLayer:
         
     async def full_protection_check(self, mint: str, contract_data: dict) -> ProtectionResult:
         """
-        Run all protection checks.
-        Returns combined protection result.
+        Run protection checks - optimized for Pump.fun new tokens.
+        Only flags CONFIRMED risks, not missing data.
         """
         threats = []
+        critical_threats = 0
         
-        # Layer 1: Contract Analysis
-        if not contract_data.get("mintAuthorityRevoked"):
-            threats.append("⚠️ Mint authority NOT revoked (infinite supply risk)")
-        if not contract_data.get("freezeAuthorityRevoked"):
-            threats.append("🚨 Freeze authority active (funds can be frozen)")
-            
-        # Layer 2: Liquidity Analysis
-        if not contract_data.get("liquidityLocked"):
-            threats.append("⚠️ Liquidity NOT locked (rug pull risk)")
-        if contract_data.get("lpBurnPercent", 0) < 50:
-            threats.append("⚠️ Less than 50% LP burned")
-            
-        # Layer 3: Holder Analysis
-        top_holder = contract_data.get("top1HolderPercent", 100)
-        if top_holder > 30:
-            threats.append(f"⚠️ Top holder owns {top_holder}% (whale dump risk)")
-        dev_wallet = contract_data.get("devWalletPercent", 100)
-        if dev_wallet > 10:
-            threats.append(f"⚠️ Dev wallet holds {dev_wallet}%")
-            
-        # Layer 4: Tax Analysis
-        buy_tax = contract_data.get("buyTax", 0)
+        # CRITICAL CHECKS (instant reject)
+        # These are confirmed honeypot/scam indicators
+        
+        # High sell tax = honeypot
         sell_tax = contract_data.get("sellTax", 0)
-        if buy_tax > 5:
-            threats.append(f"⚠️ High buy tax: {buy_tax}%")
-        if sell_tax > 5:
-            threats.append(f"🚨 High sell tax: {sell_tax}% (honeypot risk)")
-        if sell_tax > 20:
-            threats.append("🚨🚨 HONEYPOT DETECTED: Cannot sell!")
+        if sell_tax > 15:
+            threats.append(f"🚨 HIGH SELL TAX: {sell_tax}% - HONEYPOT RISK!")
+            critical_threats += 1
             
-        # Layer 5: Scammer Database
-        deployer = contract_data.get("deployer", "")
-        if deployer in self.known_scammers:
-            threats.append("🚨🚨 KNOWN SCAMMER DEPLOYER!")
-            
-        # Layer 6: Pattern Detection
+        # Hidden functions = instant reject
         if contract_data.get("hiddenMint"):
-            threats.append("🚨 Hidden mint function detected")
+            threats.append("🚨 Hidden mint function detected!")
+            critical_threats += 1
         if contract_data.get("hiddenTransferFee"):
-            threats.append("🚨 Hidden transfer fee detected")
+            threats.append("🚨 Hidden transfer fee detected!")
+            critical_threats += 1
             
-        # Calculate protection score
-        protection_score = 100 - (len(threats) * 15)
-        protection_score = max(0, protection_score)
+        # Known scammer = instant reject
+        deployer = contract_data.get("deployer", "")
+        if deployer and deployer in self.known_scammers:
+            threats.append("🚨🚨 KNOWN SCAMMER DEPLOYER!")
+            critical_threats += 2
         
-        # Determine threat level
-        if len(threats) == 0:
-            threat_level = ThreatLevel.SAFE
-            recommendation = "✅ All checks passed. Safe to trade."
-        elif len(threats) <= 2:
-            threat_level = ThreatLevel.LOW
-            recommendation = "⚠️ Minor concerns. Proceed with caution."
-        elif len(threats) <= 4:
-            threat_level = ThreatLevel.MEDIUM
-            recommendation = "⚠️ Multiple risks detected. Use small position."
-        elif len(threats) <= 6:
-            threat_level = ThreatLevel.HIGH
-            recommendation = "🚨 Significant risks. Not recommended."
-        else:
+        # MEDIUM CHECKS (proceed with caution)
+        # Only check if data is explicitly provided and bad
+        
+        # Freeze authority explicitly set to active
+        if contract_data.get("freezeAuthorityRevoked") == False:
+            threats.append("⚠️ Freeze authority active")
+            
+        # Very high dev holdings (only if explicitly provided)
+        dev_wallet = contract_data.get("devWalletPercent")
+        if dev_wallet is not None and dev_wallet > 25:
+            threats.append(f"⚠️ Dev holds {dev_wallet}%")
+            
+        # Massive top holder concentration
+        top_holder = contract_data.get("top1HolderPercent")
+        if top_holder is not None and top_holder > 50:
+            threats.append(f"⚠️ Top holder owns {top_holder}%")
+        
+        # HIGH CHECKS (only for obvious concerns)
+        buy_tax = contract_data.get("buyTax", 0)
+        if buy_tax > 10:
+            threats.append(f"⚠️ Buy tax: {buy_tax}%")
+        
+        # Calculate threat level based on severity
+        if critical_threats >= 2:
             threat_level = ThreatLevel.CRITICAL
             recommendation = "🚨🚨 CRITICAL: DO NOT TRADE!"
-            
-        passed = threat_level.value <= ThreatLevel.MEDIUM.value
+            passed = False
+        elif critical_threats == 1:
+            threat_level = ThreatLevel.HIGH
+            recommendation = "🚨 High risk detected. Not recommended."
+            passed = False
+        elif len(threats) >= 3:
+            threat_level = ThreatLevel.MEDIUM
+            recommendation = "⚠️ Multiple concerns. Use caution."
+            passed = True  # Still allow but with warning
+        elif len(threats) >= 1:
+            threat_level = ThreatLevel.LOW
+            recommendation = "⚠️ Minor concerns noted."
+            passed = True
+        else:
+            threat_level = ThreatLevel.SAFE
+            recommendation = "✅ No major risks detected."
+            passed = True
+        
+        # Protection score
+        protection_score = max(0, 100 - (critical_threats * 40) - (len(threats) * 10))
         
         if not passed:
             self.protection_stats["rugs_blocked"] += 1

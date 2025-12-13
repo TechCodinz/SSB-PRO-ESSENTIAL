@@ -11,8 +11,9 @@ import os
 
 # Import routers
 from api.routers import auth, license, orders, user, bot, simulation, referral, copy_trading, strategies, admin
+from api.routers import engine as engine_router
 from api.middleware.rate_limit import RateLimitMiddleware
-from api.database import engine, Base
+from api.database import engine as db_engine, Base
 from api.models import user as user_model, order as order_model, license as license_model
 
 # Import models to create tables
@@ -20,7 +21,7 @@ from api.routers.copy_trading import CopyRelation
 from api.routers.strategies import SharedStrategy
 
 # Create tables
-Base.metadata.create_all(bind=engine)
+Base.metadata.create_all(bind=db_engine)
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
@@ -65,6 +66,7 @@ app.include_router(referral.router, prefix="/v1/referral", tags=["Referral"])
 app.include_router(copy_trading.router, prefix="/v1/copy", tags=["Copy Trading"])
 app.include_router(strategies.router, prefix="/v1/strategies", tags=["Strategy Sharing"])
 app.include_router(admin.router, prefix="/v1/admin", tags=["Admin"])
+app.include_router(engine_router.router, prefix="/v1", tags=["Engine"])
 
 # Mount static files directory
 STATIC_DIR = os.path.join(os.path.dirname(__file__), "..", "app", "static")
@@ -84,6 +86,7 @@ async def serve_index():
 
 
 @app.get("/auth")
+@app.get("/auth.html")
 @app.get("/login")
 @app.get("/signup")
 async def serve_auth():
@@ -95,6 +98,7 @@ async def serve_auth():
 
 
 @app.get("/dashboard")
+@app.get("/dashboard.html")
 async def serve_dashboard():
     """Serve the user dashboard"""
     dashboard_path = os.path.join(STATIC_DIR, "dashboard.html")
@@ -104,6 +108,7 @@ async def serve_dashboard():
 
 
 @app.get("/admin")
+@app.get("/admin.html")
 @app.get("/admin-panel")
 async def serve_admin():
     """Serve the admin panel"""

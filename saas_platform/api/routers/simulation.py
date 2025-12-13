@@ -5,7 +5,6 @@ from typing import List, Dict, Any
 from app.services.simulation_engine import sim_engine
 
 router = APIRouter(
-    prefix="/simulation",
     tags=["simulation"]
 )
 

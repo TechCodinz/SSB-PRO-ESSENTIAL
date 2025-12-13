@@ -290,7 +290,7 @@
                 display: block !important;
                 position: fixed;
                 top: 16px;
-                left: 16px;
+                right: 16px;
                 z-index: 1001;
                 background: var(--card);
                 border: 1px solid rgba(55, 65, 81, 0.6);
@@ -326,6 +326,42 @@
                 min-width: 80px;
                 text-align: center;
             }
+
+            /* Fix inputs overflowing on mobile */
+            input,
+            select,
+            textarea {
+                max-width: 100% !important;
+                box-sizing: border-box !important;
+            }
+
+            /* Cards should not overflow */
+            .card {
+                overflow: hidden;
+                word-wrap: break-word;
+            }
+
+            /* License key input fix */
+            #license-key-input,
+            #cfg-pk {
+                font-size: 12px !important;
+            }
+
+            /* Main content padding fix */
+            .main {
+                padding: 16px;
+                padding-bottom: 80px;
+            }
+
+            /* Ensure sidebar is fully hidden */
+            .sidebar:not(.open) {
+                left: -260px !important;
+                visibility: hidden;
+            }
+
+            .sidebar.open {
+                visibility: visible;
+            }
         }
 
         /* Tablet adjustments */
@@ -355,13 +391,13 @@
     <button class="mobile-menu-toggle" onclick="toggleMobileMenu()">☰</button>
 
     <div class="sidebar" id="sidebar">
-        <div class="logo">SSB CLOUD</div>
+        <a href="/" class="logo" style="text-decoration:none; cursor:pointer;">SSB CLOUD</a>
         <a href="#" class="nav-item active" onclick="switchTab('dashboard', this)">Dashboard</a>
         <a href="#" class="nav-item" onclick="switchTab('wallet', this)">Wallet & RPC</a>
         <a href="#" class="nav-item" onclick="switchTab('strategies', this)">🧠 Strategies</a>
         <a href="#" class="nav-item" onclick="switchTab('affiliate', this)">💸 Affiliate</a>
         <a href="#" class="nav-item" onclick="switchTab('leaderboard', this)">🏆 Leaderboard</a>
-        <a href="#" class="nav-item" onclick="switchTab('copytrading', this)">🔄 Copy Trading</a>
+        <a href="#" class="nav-item" onclick="switchTab('copytrading', this)">🎯 Copy Tuning</a>
         <a href="#" class="nav-item" onclick="logout()">Logout</a>
     </div>
 
@@ -382,11 +418,10 @@
             </header>
 
             <div class="sim-toggle-wrap">
-                <div class="toggle-switch" id="sim-toggle" onclick="toggleSimulator()"></div>
+                <div class="toggle-switch toggle-active" id="sim-toggle" onclick="toggleSimulator()"></div>
                 <div style="font-size:13px; font-weight:600;">
-                    <span id="sim-label">☁️ CLOUD LIVE MODE</span>
-                    <span style="font-size:11px; color:var(--muted); display:block;">Switch to Dry Run /
-                        Simulator</span>
+                    <span id="sim-label">🟢 LIVE MODE</span>
+                    <span style="font-size:11px; color:var(--muted); display:block;">Click to switch to Dry Run</span>
                 </div>
             </div>
 
@@ -409,6 +444,7 @@
                 <div style="display:flex; justify-content:space-between; margin-bottom:16px;">
                     <h3>Live Execution Log</h3>
                     <div style="display:flex; gap:8px;">
+                        <button class="btn" onclick="openSettings()" style="background:#4f46e5;">⚙️ SETTINGS</button>
                         <button class="btn btn-primary" onclick="startBot()">START ENGINE</button>
                         <button class="btn btn-danger" onclick="stopBot()">STOP</button>
                     </div>
@@ -417,6 +453,46 @@
                     <div class="log-line">[SYSTEM] Connecting to WebSocket...</div>
                     <div class="log-line">[SYSTEM] Authenticated as user.</div>
                     <div class="log-line">[ENGINE] Waiting for commands...</div>
+                </div>
+            </div>
+
+            <!-- Settings Modal -->
+            <div id="settings-modal"
+                style="display:none; position:fixed; top:0; left:0; right:0; bottom:0; background:rgba(0,0,0,0.8); z-index:9999; display:none; justify-content:center; align-items:center;">
+                <div style="background:var(--surface); border-radius:12px; padding:24px; width:400px; max-width:90%;">
+                    <h2 style="margin-top:0; color:var(--accent);">⚙️ Bot Settings</h2>
+
+                    <div style="margin-bottom:16px;">
+                        <label style="display:block; margin-bottom:4px; color:var(--muted);">Position Size (SOL)</label>
+                        <input type="number" id="setting-position" value="0.1" step="0.1" min="0.05" max="10"
+                            style="width:100%; padding:10px; background:#1e293b; border:1px solid #334155; border-radius:6px; color:white;">
+                    </div>
+
+                    <div style="margin-bottom:16px;">
+                        <label style="display:block; margin-bottom:4px; color:var(--muted);">Confidence Threshold
+                            (%)</label>
+                        <input type="number" id="setting-confidence" value="30" step="5" min="10" max="95"
+                            style="width:100%; padding:10px; background:#1e293b; border:1px solid #334155; border-radius:6px; color:white;">
+                    </div>
+
+                    <div style="margin-bottom:16px;">
+                        <label style="display:block; margin-bottom:4px; color:var(--muted);">Take Profit (%)</label>
+                        <input type="number" id="setting-tp" value="30" step="5" min="5" max="200"
+                            style="width:100%; padding:10px; background:#1e293b; border:1px solid #334155; border-radius:6px; color:white;">
+                    </div>
+
+                    <div style="margin-bottom:24px;">
+                        <label style="display:block; margin-bottom:4px; color:var(--muted);">Stop Loss (%)</label>
+                        <input type="number" id="setting-sl" value="15" step="5" min="5" max="50"
+                            style="width:100%; padding:10px; background:#1e293b; border:1px solid #334155; border-radius:6px; color:white;">
+                    </div>
+
+                    <div style="display:flex; gap:12px;">
+                        <button class="btn btn-primary" onclick="saveSettings()" style="flex:1;">💾 Save
+                            Settings</button>
+                        <button class="btn" onclick="closeSettings()"
+                            style="flex:1; background:#374151;">Cancel</button>
+                    </div>
                 </div>
             </div>
         </div>
@@ -441,13 +517,21 @@
                 <div style="margin-bottom:16px;">
                     <label style="font-size:12px; font-weight:600; display:block; margin-bottom:8px;">PRIVATE KEY
                         (Base58)</label>
-                    <input type="password" id="cfg-pk" placeholder="Listening to Phantom export format..."
-                        style="width:100%; padding:12px; background:rgba(0,0,0,0.3); border:1px solid #334155; color:white; border-radius:6px; font-family:monospace;">
+                    <div style="position:relative;">
+                        <input type="password" id="cfg-pk" placeholder="Paste your Phantom wallet private key..."
+                            style="width:100%; padding:12px; padding-right:80px; background:rgba(0,0,0,0.3); border:1px solid #334155; color:white; border-radius:6px; font-family:monospace;">
+                        <button type="button" onclick="toggleKeyVisibility()" id="toggle-key-btn"
+                            style="position:absolute; right:8px; top:50%; transform:translateY(-50%); background:rgba(255,255,255,0.1); border:none; color:var(--muted); padding:6px 12px; border-radius:4px; cursor:pointer; font-size:11px;">
+                            👁️ SHOW
+                        </button>
+                    </div>
                 </div>
 
-                <div style="display:flex; gap:12px; align-items:center;">
+                <div style="display:flex; gap:12px; align-items:center; flex-wrap:wrap;">
                     <button class="btn btn-primary" onclick="saveConfig()">🔒 SAVE SECURELY</button>
-                    <div id="save-status" style="font-size:12px; display:none;"></div>
+                    <div id="save-status"
+                        style="font-size:13px; display:none; padding:8px 16px; border-radius:6px; background:rgba(74,222,128,0.1); border:1px solid rgba(74,222,128,0.3);">
+                    </div>
                 </div>
 
                 <div style="margin-top:24px; padding:16px; background:rgba(255,255,255,0.03); border-radius:8px;">
@@ -464,6 +548,39 @@
                             <div style="font-size:12px; color:var(--muted);">Balance</div>
                             <div style="font-weight:700; color:#4ade80;" id="wallet-balance-display">-- SOL</div>
                         </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- LICENSE KEY ACTIVATION -->
+            <div class="card" style="margin-top: 24px; border-color: rgba(74,222,128,0.4);">
+                <h3 style="margin-top:0; color:#4ade80;">🔑 Activate License Key</h3>
+                <p style="font-size:13px; color:var(--muted); margin-bottom:16px;">
+                    Enter your license key to unlock LIVE trading mode. Get a license key by purchasing a plan.
+                </p>
+
+                <div style="margin-bottom:16px;">
+                    <label style="font-size:12px; font-weight:600; display:block; margin-bottom:8px;">LICENSE
+                        KEY</label>
+                    <input type="text" id="license-key-input" placeholder="SSB-XXXX-XXXX-XXXX-XXXX"
+                        style="width:100%; padding:12px; background:rgba(0,0,0,0.3); border:1px solid #374151; color:white; border-radius:6px; font-family:monospace; text-transform:uppercase;">
+                </div>
+
+                <div style="display:flex; gap:12px; align-items:center;">
+                    <button class="btn btn-primary" onclick="activateLicense()"
+                        style="background:#4ade80; color:#000;">🚀 ACTIVATE LICENSE</button>
+                    <div id="license-status" style="font-size:12px; display:none;"></div>
+                </div>
+
+                <div style="margin-top:16px; padding:12px; background:rgba(255,255,255,0.03); border-radius:8px;">
+                    <div style="display:flex; justify-content:space-between; align-items:center;">
+                        <div>
+                            <div style="font-size:12px; color:var(--muted);">Current Plan</div>
+                            <div style="font-weight:700;" id="current-plan-display">TRIAL (Simulator Only)</div>
+                        </div>
+                        <a href="/" class="btn"
+                            style="background:rgba(168,85,247,0.2); color:#a855f7; border:1px solid rgba(168,85,247,0.3);">💎
+                            BUY LICENSE</a>
                     </div>
                 </div>
             </div>
@@ -566,39 +683,75 @@
             </div>
         </div>
 
-        <!-- Copy Trading View -->
+        <!-- Copy Tuning View -->
         <div id="view-copytrading" style="display:none; max-width: 900px;">
             <header>
                 <div>
-                    <h1 style="margin:0; font-size:24px;">🔄 Copy Trading</h1>
-                    <div style="font-size:12px; color:var(--muted); margin-top:4px;">Automatically copy trades from top
-                        performers</div>
+                    <h1 style="margin:0; font-size:24px;">🎯 Copy Tuning</h1>
+                    <div style="font-size:12px; color:var(--muted); margin-top:4px;">Copy profitable bot settings from
+                        top traders</div>
                 </div>
             </header>
 
             <div class="card"
                 style="margin-bottom:24px; background: linear-gradient(135deg, rgba(34,211,238,0.1), rgba(168,85,247,0.05));">
-                <h3 style="margin-top:0; color:var(--accent);">🎯 How It Works</h3>
+                <h3 style="margin-top:0; color:var(--accent);">🎮 How Copy Tuning Works</h3>
                 <p style="font-size:13px; color:var(--muted);">
-                    1. Browse top performers below<br>
-                    2. Click "Follow" to start copying their trades<br>
-                    3. Set your allocation % and max trade size<br>
-                    4. Sit back and profit from their expertise!
+                    1. 🔍 Browse tuning settings from top performers below<br>
+                    2. ⚡ <strong>Apply Instant</strong> - Use their settings immediately<br>
+                    3. 💾 <strong>Save to My Tunings</strong> - Save and test before using<br>
+                    4. 📊 <strong>Track Performance</strong> - Bot tells you if copied tuning beats your original!<br>
+                    5. 🏆 <strong>Earn Rewards</strong> - If others profit from YOUR tuning, you earn XP!
                 </p>
             </div>
 
-            <!-- Top Leaders to Copy -->
-            <h3 style="margin-bottom:16px;">🏆 Top Performers Available</h3>
-            <div id="copy-leaders-grid"
-                style="display:grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap:16px;">
-                <div class="card" style="text-align:center; padding:20px; color:var(--muted);">Loading top leaders...
+            <!-- Comparison Banner -->
+            <div id="tuning-comparison" class="card"
+                style="display:none; margin-bottom:20px; background:rgba(74,222,128,0.1); border:1px solid rgba(74,222,128,0.3);">
+                <div style="display:flex; justify-content:space-between; align-items:center;">
+                    <div>
+                        <div style="color:#4ade80; font-weight:700;">📈 Tuning Performance Update</div>
+                        <div id="tuning-comparison-text" style="font-size:13px; color:var(--muted);">Your copied tuning
+                            is making +15% more profit than your original settings!</div>
+                    </div>
+                    <button class="btn" style="background:#4ade80; color:#000;" onclick="keepTuning()">✅ Keep
+                        This</button>
                 </div>
             </div>
 
-            <!-- My Active Copies -->
-            <h3 style="margin-top:32px; margin-bottom:16px;">📊 Your Active Copies</h3>
+            <!-- Top Tunings to Copy -->
+            <h3 style="margin-bottom:16px;">🏆 Top Tunings Available</h3>
+            <div id="copy-leaders-grid"
+                style="display:grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap:16px;">
+                <div class="card" style="text-align:center; padding:20px; color:var(--muted);">Loading top tunings...
+                </div>
+            </div>
+
+            <!-- My Saved Tunings -->
+            <h3 style="margin-top:32px; margin-bottom:16px;">💾 My Saved Tunings</h3>
             <div id="my-copies-list" class="card">
-                <div style="padding:20px; text-align:center; color:var(--muted);">You're not copying anyone yet.</div>
+                <div style="padding:20px; text-align:center; color:var(--muted);">No tunings saved yet. Copy a tuning
+                    above to get started!</div>
+            </div>
+
+            <!-- My Shared Tuning Stats -->
+            <div class="card"
+                style="margin-top:24px; background:linear-gradient(135deg, rgba(168,85,247,0.1), rgba(34,211,238,0.05)); border:1px solid rgba(168,85,247,0.3);">
+                <h3 style="margin-top:0; color:#a855f7;">🌟 Your Tuning Rewards</h3>
+                <div style="display:grid; grid-template-columns: repeat(3, 1fr); gap:16px; margin-top:12px;">
+                    <div style="text-align:center;">
+                        <div style="font-size:24px; font-weight:700; color:#a855f7;" id="tuning-copies">0</div>
+                        <div style="font-size:11px; color:var(--muted);">People Using Your Tuning</div>
+                    </div>
+                    <div style="text-align:center;">
+                        <div style="font-size:24px; font-weight:700; color:#4ade80;" id="tuning-generated-pnl">+$0</div>
+                        <div style="font-size:11px; color:var(--muted);">Profit Generated for Others</div>
+                    </div>
+                    <div style="text-align:center;">
+                        <div style="font-size:24px; font-weight:700; color:#22d3ee;" id="tuning-xp-earned">0 XP</div>
+                        <div style="font-size:11px; color:var(--muted);">Rewards XP Earned</div>
+                    </div>
+                </div>
             </div>
         </div>
 
@@ -812,42 +965,99 @@
     </style>
 
     <script>
-        const API = "https://api.ssbpro.dev/v1";
-        let userPlan = 'standard'; // Global plan variable
+        // Use current host for API (works on VPS and local)
+        const API_BASE = "https://api.ssbpro.dev";
+        const API = API_BASE + "/v1";
+        let userPlan = 'trial'; // Global plan variable - default to trial for freemium
 
         async function init() {
             const token = localStorage.getItem('ssb_token');
             if (!token) window.location.href = '/auth.html';
 
             try {
-                // Fetch User Profile
-                const res = await fetch(`${API}/user/profile`, {
+                // Fetch current user from /me endpoint (has actual plan)
+                const meRes = await fetch(`${API}/me`, {
                     headers: { 'Authorization': `Bearer ${token}` }
                 });
-                if (res.status === 401) logout();
+                if (meRes.status === 401) logout();
 
-                const user = await res.json();
-                document.getElementById('user-email').innerText = user.email;
+                const me = await meRes.json();
+                document.getElementById('user-email').innerText = me.email;
 
-                // Store plan globally
-                userPlan = user.license ? user.license.plan : 'standard';
-                document.getElementById('stat-plan').innerText = userPlan.toUpperCase();
+                // Store plan globally - from direct user object, not license
+                userPlan = me.plan || 'trial';
+                document.getElementById('stat-plan').innerText = userPlan.toUpperCase().replace(/_/g, ' ');
+
+                // Update ALL plan display elements
+                const planDisplay = userPlan.toUpperCase().replace(/_/g, ' ');
+                const planBadge = document.getElementById('plan-badge');
+                const currentPlanDisplay = document.getElementById('current-plan-display');
+
+                if (planBadge) planBadge.innerText = planDisplay;
+                if (currentPlanDisplay) {
+                    if (userPlan.toLowerCase() === 'admin') {
+                        currentPlanDisplay.innerHTML = 'ADMIN (GOD MODE)';
+                    } else if (userPlan.toLowerCase() !== 'trial') {
+                        currentPlanDisplay.innerHTML = planDisplay + ' (LIVE ENABLED)';
+                    } else {
+                        currentPlanDisplay.innerHTML = 'TRIAL (Simulator Only)';
+                    }
+                }
 
                 // Load plan-gated settings
                 loadPlanSettings(userPlan);
 
                 // Fetch Cloud Status
-                const statusRes = await fetch(`${API}/user/cloud-status`, {
-                    headers: { 'Authorization': `Bearer ${token}` }
-                });
-                const status = await statusRes.json();
+                try {
+                    const statusRes = await fetch(`${API}/user/cloud-status`, {
+                        headers: { 'Authorization': `Bearer ${token}` }
+                    });
+                    if (statusRes.ok) {
+                        const status = await statusRes.json();
+                        document.getElementById('stat-pnl').innerText = `+$${status.pnl_today || 0}`;
+                        document.getElementById('stat-scanned').innerText = status.tokens_scanned || 0;
+                    }
+                } catch (e) {
+                    console.log('Cloud status not available');
+                }
 
-                document.getElementById('stat-pnl').innerText = `+$${status.pnl_today || 0}`;
-                document.getElementById('stat-scanned').innerText = status.tokens_scanned || 0;
+                // Check if engine is already running (auto-resume)
+                try {
+                    const engineRes = await fetch(`${API}/engine/status`, {
+                        headers: { 'Authorization': `Bearer ${token}` }
+                    });
+                    if (engineRes.ok) {
+                        const engineData = await engineRes.json();
+                        if (engineData.status === 'running') {
+                            log("[ENGINE] Auto-resuming - engine is already running on server");
+                            startPollingEngine();
+                        }
+                    }
+                } catch (e) {
+                    console.log('Engine status check skipped');
+                }
+
+                // Load wallet status (show saved wallet on reload)
+                try {
+                    const walletRes = await fetch(`${API}/wallet/status`, {
+                        headers: { 'Authorization': `Bearer ${token}` }
+                    });
+                    if (walletRes.ok) {
+                        const walletData = await walletRes.json();
+                        if (walletData.configured) {
+                            document.getElementById('wallet-address-display').innerText = walletData.address;
+                            document.getElementById('wallet-balance-display').innerText = walletData.balance + ' SOL';
+                        }
+                    }
+                } catch (e) {
+                    console.log('Wallet status check skipped');
+                }
 
                 document.getElementById('loader').style.display = 'none';
             } catch (e) {
                 console.error(e);
+                // Fallback to logout on error
+                logout();
             }
         }
 
@@ -863,11 +1073,13 @@
 
             const label = document.getElementById('sim-label');
             if (isSimMode) {
-                label.innerHTML = "🧪 SIMULATOR MODE (Dry Run)";
-                document.getElementById('stat-plan').innerText = "UNLIMITED (DEV)";
+                // DRY RUN mode - grey toggle
+                label.innerHTML = "🧪 DRY RUN MODE";
+                document.getElementById('stat-plan').innerText = "SIMULATOR";
                 startPollingSim();
             } else {
-                label.innerHTML = "☁️ CLOUD LIVE MODE";
+                // LIVE mode - green toggle
+                label.innerHTML = "🟢 LIVE MODE";
                 location.reload(); // Reset to live state
             }
         }
@@ -877,7 +1089,35 @@
                 await fetch(`${API}/simulation/start`, { method: 'POST' });
                 log("Executing Dry Run on Neural Engine...");
             } else {
-                alert("Live trading engine requires active Cloud subscription.");
+                // Check if user has a cloud plan that allows live trading
+                const cloudPlans = ['cloud_sniper', 'cloud_sniper_pro', 'cloud_sniper_elite', 'pro', 'elite', 'standard', 'admin', 'whale', 'trial'];
+                if (cloudPlans.includes(userPlan?.toLowerCase())) {
+                    log("[ENGINE] Starting LIVE trading engine...");
+                    log("[ENGINE] Connecting to Pump.fun WebSocket...");
+                    try {
+                        const token = localStorage.getItem('ssb_token');
+                        const res = await fetch(`${API}/engine/start`, {
+                            method: 'POST',
+                            headers: {
+                                'Authorization': `Bearer ${token}`,
+                                'Content-Type': 'application/json'
+                            },
+                            body: JSON.stringify({ mode: 'LIVE' })  // Tell engine to use LIVE mode with saved wallet
+                        });
+                        const data = await res.json();
+                        if (data.success) {
+                            log("[ENGINE] ✅ Live engine started successfully!");
+                            log("[ENGINE] Scanning for opportunities...");
+                            startPollingEngine(); // Start polling for real-time logs
+                        } else {
+                            log("[ENGINE] ❌ " + (data.detail || data.message || "Failed to start engine"));
+                        }
+                    } catch (e) {
+                        log("[ENGINE] ❌ Connection error: " + e.message);
+                    }
+                } else {
+                    alert("Live trading engine requires active Cloud subscription. Your current plan: " + (userPlan || "trial"));
+                }
             }
         }
 
@@ -885,6 +1125,22 @@
             if (isSimMode) {
                 await fetch(`${API}/simulation/stop`, { method: 'POST' });
                 log("Stopping Simulation...");
+            } else {
+                log("[ENGINE] Stopping live engine...");
+                try {
+                    const token = localStorage.getItem('ssb_token');
+                    await fetch(`${API}/engine/stop`, {
+                        method: 'POST',
+                        headers: {
+                            'Authorization': `Bearer ${token}`,
+                            'Content-Type': 'application/json'
+                        }
+                    });
+                    log("[ENGINE] Engine stopped.");
+                    stopPollingEngine(); // Stop polling
+                } catch (e) {
+                    log("[ENGINE] Error: " + e.message);
+                }
             }
         }
 
@@ -913,6 +1169,108 @@
                     }
                 } catch (e) { console.error(e); }
             }, 1000); // 1s poll rate
+        }
+
+        // Live engine state polling
+        let enginePollInterval = null;
+
+        function startPollingEngine() {
+            if (enginePollInterval) clearInterval(enginePollInterval);
+            const token = localStorage.getItem('ssb_token');
+
+            enginePollInterval = setInterval(async () => {
+                if (isSimMode) return; // Only poll when in live mode
+                try {
+                    const res = await fetch(`${API}/engine/state`, {
+                        headers: { 'Authorization': `Bearer ${token}` }
+                    });
+                    const data = await res.json();
+
+                    if (data.success && data.is_running) {
+                        // Update stats
+                        document.getElementById('stat-scanned').innerText = data.tokens_scanned || 0;
+                        if (data.total_pnl) {
+                            document.getElementById('stat-pnl').innerText = `+$${data.total_pnl.toFixed(2)}`;
+                        }
+
+                        // Update console with logs
+                        if (data.logs && data.logs.length > 0) {
+                            const consoleBox = document.getElementById('console');
+                            consoleBox.innerHTML = ""; // Clear for fresh logs
+                            data.logs.forEach(logEntry => {
+                                const d = document.createElement('div');
+                                d.className = 'log-line';
+                                const lvl = logEntry.level || 'info';
+                                const ts = logEntry.timestamp || '';
+                                const msg = logEntry.message || '';
+                                // Color code by level
+                                let color = '#00ff88';
+                                if (lvl === 'warning') color = '#ffa500';
+                                if (lvl === 'danger' || lvl === 'error') color = '#ff4444';
+                                if (lvl === 'success') color = '#00ff88';
+                                d.innerHTML = `<span style="color:${color}">[${ts}] [${lvl.toUpperCase()}]</span> ${msg}`;
+                                consoleBox.appendChild(d);
+                            });
+                            consoleBox.scrollTop = consoleBox.scrollHeight;
+                        }
+                    }
+                } catch (e) {
+                    console.error('Engine poll error:', e);
+                }
+            }, 2000); // 2s poll rate for live engine
+        }
+
+        function stopPollingEngine() {
+            if (enginePollInterval) {
+                clearInterval(enginePollInterval);
+                enginePollInterval = null;
+            }
+        }
+
+        // Settings Modal Functions
+        function openSettings() {
+            // Load saved settings
+            const savedSettings = JSON.parse(localStorage.getItem('ssb_bot_settings') || '{}');
+            document.getElementById('setting-position').value = savedSettings.position_size || 0.1;
+            document.getElementById('setting-confidence').value = savedSettings.confidence || 30;
+            document.getElementById('setting-tp').value = savedSettings.take_profit || 30;
+            document.getElementById('setting-sl').value = savedSettings.stop_loss || 15;
+
+            document.getElementById('settings-modal').style.display = 'flex';
+        }
+
+        function closeSettings() {
+            document.getElementById('settings-modal').style.display = 'none';
+        }
+
+        async function saveSettings() {
+            const settings = {
+                position_size: parseFloat(document.getElementById('setting-position').value),
+                confidence: parseInt(document.getElementById('setting-confidence').value),
+                take_profit: parseInt(document.getElementById('setting-tp').value),
+                stop_loss: parseInt(document.getElementById('setting-sl').value)
+            };
+
+            // Save locally
+            localStorage.setItem('ssb_bot_settings', JSON.stringify(settings));
+
+            // Save to server
+            try {
+                const token = localStorage.getItem('ssb_token');
+                await fetch(`${API}/engine/settings`, {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(settings)
+                });
+            } catch (e) {
+                console.log('Settings saved locally only');
+            }
+
+            log(`Settings saved: ${settings.position_size} SOL, ${settings.confidence}% confidence`);
+            closeSettings();
         }
 
         function log(msg) {
@@ -1004,16 +1362,17 @@
             const badge = document.getElementById('plan-badge');
             const content = document.getElementById('settings-content');
 
-            // Plan tiers and their features
+            // Plan tiers and their features - ALL users can customize for testing
             const PLAN_FEATURES = {
-                'demo': { canCustomize: false, label: 'DEMO', color: '#9ca3af' },
-                'standard': { canCustomize: false, label: 'STANDARD', color: '#22d3ee' },
+                'trial': { canCustomize: true, label: 'TRIAL', color: '#4ade80', maxTP: 30, maxSL: 15, note: 'Simulator Only' },
+                'demo': { canCustomize: true, label: 'DEMO', color: '#9ca3af', maxTP: 30, maxSL: 15 },
+                'standard': { canCustomize: true, label: 'STANDARD', color: '#22d3ee', maxTP: 40, maxSL: 20 },
                 'cloud_sniper': { canCustomize: true, label: 'CLOUD PRO', color: '#a855f7', maxTP: 50, maxSL: 25 },
                 'pro': { canCustomize: true, label: 'PRO', color: '#fbbf24', maxTP: 100, maxSL: 50 },
                 'elite': { canCustomize: true, label: 'ELITE', color: '#f43f5e', maxTP: 200, maxSL: 100, advanced: true }
             };
 
-            const features = PLAN_FEATURES[plan] || PLAN_FEATURES['standard'];
+            const features = PLAN_FEATURES[plan] || PLAN_FEATURES['trial'];
 
             // Update badge
             badge.innerText = features.label;
@@ -1444,10 +1803,163 @@
             }
         }
 
+        // ========== LICENSE KEY ACTIVATION ==========
+        async function activateLicense() {
+            const licenseKey = document.getElementById('license-key-input').value.trim().toUpperCase();
+            const statusEl = document.getElementById('license-status');
+
+            if (!licenseKey) {
+                alert('Please enter a license key');
+                return;
+            }
+
+            statusEl.style.display = 'block';
+            statusEl.style.color = 'var(--accent)';
+            statusEl.innerHTML = '⏳ Validating license...';
+
+            const token = localStorage.getItem('ssb_token');
+
+            try {
+                const res = await fetch(`${API}/license/activate`, {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ license_key: licenseKey })
+                });
+
+                const data = await res.json();
+
+                if (data.success) {
+                    statusEl.innerHTML = '✅ License activated successfully!';
+                    statusEl.style.color = '#4ade80';
+                    document.getElementById('license-key-input').value = '';
+                    document.getElementById('current-plan-display').innerHTML = data.plan.toUpperCase() + ' (LIVE ENABLED)';
+                    document.getElementById('stat-plan').innerText = data.plan.toUpperCase();
+                    userPlan = data.plan;
+                    loadPlanSettings(data.plan);
+                    alert('🎉 License activated! You now have access to LIVE trading with the ' + data.plan.toUpperCase() + ' plan.');
+                } else {
+                    statusEl.innerHTML = '❌ ' + (data.detail || 'Invalid license key');
+                    statusEl.style.color = '#f87171';
+                }
+            } catch (e) {
+                console.error(e);
+                statusEl.innerHTML = '❌ Connection error';
+                statusEl.style.color = '#f87171';
+            }
+        }
+
+        // Toggle private key visibility
+        function toggleKeyVisibility() {
+            const input = document.getElementById('cfg-pk');
+            const btn = document.getElementById('toggle-key-btn');
+            if (input.type === 'password') {
+                input.type = 'text';
+                btn.innerHTML = '🙈 HIDE';
+            } else {
+                input.type = 'password';
+                btn.innerHTML = '👁️ SHOW';
+            }
+        }
+
+        // Save wallet configuration
+        async function saveConfig() {
+            const pk = document.getElementById('cfg-pk').value.trim();
+            const statusEl = document.getElementById('save-status');
+
+            if (!pk) {
+                statusEl.style.display = 'block';
+                statusEl.style.background = 'rgba(248,113,113,0.1)';
+                statusEl.style.borderColor = 'rgba(248,113,113,0.3)';
+                statusEl.style.color = '#f87171';
+                statusEl.innerHTML = '❌ Please enter your private key first';
+                return;
+            }
+
+            statusEl.style.display = 'block';
+            statusEl.style.background = 'rgba(34,211,238,0.1)';
+            statusEl.style.borderColor = 'rgba(34,211,238,0.3)';
+            statusEl.style.color = '#22d3ee';
+            statusEl.innerHTML = '⏳ Encrypting & saving securely...';
+
+            const token = localStorage.getItem('ssb_token');
+
+            try {
+                const res = await fetch(`${API}/wallet/config`, {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ private_key: pk })
+                });
+
+                const data = await res.json();
+
+                if (data.success) {
+                    statusEl.style.background = 'rgba(74,222,128,0.1)';
+                    statusEl.style.borderColor = 'rgba(74,222,128,0.3)';
+                    statusEl.style.color = '#4ade80';
+                    statusEl.innerHTML = '✅ Wallet saved securely!';
+                    document.getElementById('cfg-pk').value = ''; // Clear for security
+                    document.getElementById('cfg-pk').type = 'password';
+                    document.getElementById('toggle-key-btn').innerHTML = '👁️ SHOW';
+
+                    if (data.address) {
+                        document.getElementById('wallet-address-display').innerText = data.address;
+                    }
+                    if (data.balance !== undefined) {
+                        document.getElementById('wallet-balance-display').innerText = data.balance + ' SOL';
+                    }
+                } else {
+                    statusEl.style.background = 'rgba(248,113,113,0.1)';
+                    statusEl.style.borderColor = 'rgba(248,113,113,0.3)';
+                    statusEl.style.color = '#f87171';
+                    statusEl.innerHTML = '❌ ' + (data.detail || data.message || 'Failed to save');
+                }
+            } catch (e) {
+                console.error(e);
+                statusEl.style.background = 'rgba(248,113,113,0.1)';
+                statusEl.style.borderColor = 'rgba(248,113,113,0.3)';
+                statusEl.style.color = '#f87171';
+                statusEl.innerHTML = '❌ Connection error - try again';
+            }
+        }
+
         // Mobile menu toggle
         function toggleMobileMenu() {
-            document.getElementById('sidebar').classList.toggle('open');
+            const sidebar = document.getElementById('sidebar');
+            sidebar.classList.toggle('open');
+
+            // Add/remove overlay when sidebar opens
+            if (sidebar.classList.contains('open')) {
+                const overlay = document.createElement('div');
+                overlay.id = 'mobile-overlay';
+                overlay.style.cssText = 'position:fixed; inset:0; background:rgba(0,0,0,0.5); z-index:999;';
+                overlay.onclick = () => {
+                    sidebar.classList.remove('open');
+                    overlay.remove();
+                };
+                document.body.appendChild(overlay);
+            } else {
+                const overlay = document.getElementById('mobile-overlay');
+                if (overlay) overlay.remove();
+            }
         }
+
+        // Close sidebar when clicking nav items on mobile
+        document.querySelectorAll('.nav-item').forEach(item => {
+            item.addEventListener('click', () => {
+                const sidebar = document.getElementById('sidebar');
+                if (window.innerWidth <= 768 && sidebar.classList.contains('open')) {
+                    sidebar.classList.remove('open');
+                    const overlay = document.getElementById('mobile-overlay');
+                    if (overlay) overlay.remove();
+                }
+            });
+        });
 
         window.onload = init;
     </script>

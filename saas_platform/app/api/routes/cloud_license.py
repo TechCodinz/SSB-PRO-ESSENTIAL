@@ -366,20 +366,53 @@ async def get_dashboard_data(
     sessions = usage_monitor.get_user_sessions(str(user.id))
     active_session = sessions[0] if sessions else None
     
-    # Today's metrics
+    # Today's metrics (try Redis first for worker stats)
     today_metrics = {
         "tokens_scanned": 0,
         "filters_passed": 0,
         "trades_triggered": 0,
-        "avg_confidence": 0.0
+        "avg_confidence": 0.0,
+        "pnl": 0.0,
+        "wins": 0,
+        "losses": 0
     }
     
-    if active_session:
+    # Try to get live stats from Redis (set by worker engine)
+    try:
+        import redis
+        r = redis.Redis(host='localhost', port=6379, decode_responses=True)
+        user_id_hash = str(user.id)[:16]  # Worker uses first 16 chars
+        key_prefix = f"ssb:stats:{user_id_hash}"
+        
+        redis_tokens = r.get(f"{key_prefix}:tokens_scanned")
+        redis_buys = r.get(f"{key_prefix}:live_buys")
+        redis_pnl = r.get(f"{key_prefix}:pnl")
+        redis_wins = r.get(f"{key_prefix}:wins")
+        redis_losses = r.get(f"{key_prefix}:losses")
+        
+        if redis_tokens:
+            today_metrics["tokens_scanned"] = int(redis_tokens)
+        if redis_buys:
+            today_metrics["trades_triggered"] = int(redis_buys)
+        if redis_pnl:
+            today_metrics["pnl"] = float(redis_pnl)
+        if redis_wins:
+            today_metrics["wins"] = int(redis_wins)
+        if redis_losses:
+            today_metrics["losses"] = int(redis_losses)
+    except Exception:
+        pass  # Fall back to session stats if Redis fails
+    
+    # Fall back to usage monitor if no Redis stats
+    if active_session and today_metrics["tokens_scanned"] == 0:
         today_metrics = {
             "tokens_scanned": active_session.tokens_scanned,
             "filters_passed": active_session.filters_passed,
             "trades_triggered": active_session.trades_triggered,
-            "avg_confidence": round(active_session.avg_confidence, 2)
+            "avg_confidence": round(active_session.avg_confidence, 2),
+            "pnl": 0.0,
+            "wins": 0,
+            "losses": 0
         }
     
     # HWID info

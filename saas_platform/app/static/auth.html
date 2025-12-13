@@ -202,6 +202,11 @@
             <div class="form-group">
                 <label>Password</label>
                 <input type="password" id="login-pass" required placeholder="••••••••">
+                <label
+                    style="font-size:11px; margin-top:6px; display:flex; align-items:center; gap:6px; cursor:pointer;">
+                    <input type="checkbox" onclick="togglePassword('login-pass', this)"
+                        style="width:14px; height:14px; cursor:pointer;"> Show password
+                </label>
             </div>
             <button type="submit" id="login-btn">Log In</button>
             <div class="toggle-text">
@@ -218,6 +223,11 @@
             <div class="form-group">
                 <label>Password</label>
                 <input type="password" id="signup-pass" required placeholder="Create password">
+                <label
+                    style="font-size:11px; margin-top:6px; display:flex; align-items:center; gap:6px; cursor:pointer;">
+                    <input type="checkbox" onclick="togglePassword('signup-pass', this)"
+                        style="width:14px; height:14px; cursor:pointer;"> Show password
+                </label>
             </div>
             <div class="form-group">
                 <label>Plan</label>
@@ -236,12 +246,18 @@
     </div>
 
     <script>
+        // Use current host for API (works on VPS and local)
         const API_URL = "https://api.ssbpro.dev/v1";
 
         function toggleAuth() {
             document.getElementById('login-form').classList.toggle('hidden');
             document.getElementById('signup-form').classList.toggle('hidden');
             document.getElementById('error-msg').innerText = "";
+        }
+
+        function togglePassword(inputId, checkbox) {
+            const input = document.getElementById(inputId);
+            input.type = checkbox.checked ? 'text' : 'password';
         }
 
         async function handleLogin(e) {
@@ -266,7 +282,7 @@
                 localStorage.setItem('ssb_token', data.access_token);
                 localStorage.setItem('ssb_user', JSON.stringify(data.user));
 
-                window.location.href = '/dashboard.html';
+                window.location.href = '/dashboard';
             } catch (err) {
                 document.getElementById('error-msg').innerText = err.message;
             } finally {
@@ -295,15 +311,25 @@
                 const data = await res.json();
                 if (!res.ok) throw new Error(data.detail || "Signup failed");
 
-                // Auto login after signup? Or prompt verification
-                alert('Account created! Please verify your email via the link sent (Mock: check verification logic). Logging you in...');
+                // Auto-login: store tokens and redirect to dashboard
+                if (data.access_token) {
+                    localStorage.setItem('ssb_token', data.access_token);
+                    localStorage.setItem('ssb_user', JSON.stringify({
+                        id: data.user_id,
+                        email: email,
+                        plan: 'trial'
+                    }));
 
-                // For now, auto-login logic or just redirect to login to force flow
-                toggleAuth();
-                document.getElementById('login-email').value = email;
-                document.getElementById('login-pass').value = password;
-                document.getElementById('error-msg').innerText = "Account created. Please login.";
-                document.getElementById('error-msg').style.color = "#4ade80";
+                    alert('🎉 Account created! You can now use the simulator. Upgrade to a paid plan for live trading.');
+                    window.location.href = '/dashboard';
+                } else {
+                    // Fallback to manual login
+                    toggleAuth();
+                    document.getElementById('login-email').value = email;
+                    document.getElementById('login-pass').value = password;
+                    document.getElementById('error-msg').innerText = "Account created. Please login.";
+                    document.getElementById('error-msg').style.color = "#4ade80";
+                }
 
             } catch (err) {
                 document.getElementById('error-msg').innerText = err.message;

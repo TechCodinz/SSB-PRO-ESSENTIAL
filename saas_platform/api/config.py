@@ -23,6 +23,10 @@ class Settings(BaseSettings):
     APP_NAME: str = "SSB PRO Cloud API"
     DEBUG: bool = False
     
+    # Server (used by VPS)
+    HOST: str = "0.0.0.0"
+    PORT: int = 8000
+    
     # Database
     DATABASE_URL: str = "sqlite:///./ssb_pro.db"
     
@@ -50,8 +54,13 @@ class Settings(BaseSettings):
     # Admin
     ADMIN_PASSWORD: str = os.getenv("ADMIN_PASSWORD", "SSB2025Admin")
     
+    # Telegram (optional)
+    TELEGRAM_BOT_TOKEN: str = ""
+    ADMIN_CHAT_ID: str = ""
+    
     class Config:
         env_file = ".env"
+        extra = "ignore"  # Allow unknown env vars without crashing
 
 
 settings = Settings()

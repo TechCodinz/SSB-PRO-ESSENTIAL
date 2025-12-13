@@ -41,7 +41,7 @@ class ConfigUpdateRequest(BaseModel):
 # Encryption Helper
 def _get_cipher():
     # Derive a 32-byte key from the secret key
-    key = hashlib.sha256(settings.SECRET_KEY.encode()).digest()
+    key = hashlib.sha256(settings.JWT_SECRET.encode()).digest()
     return Fernet(base64.urlsafe_b64encode(key))
 
 def _encrypt_key(key: str) -> str:
