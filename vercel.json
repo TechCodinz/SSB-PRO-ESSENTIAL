@@ -21,8 +21,8 @@
             "destination": "/saas_platform/app/static/auth.html"
         },
         {
-            "source": "/(.*)",
-            "destination": "/saas_platform/app/static/$1"
+            "source": "/",
+            "destination": "/index.html"
         }
     ]
 }
