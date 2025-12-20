@@ -1,0 +1,31 @@
+user_id,session_id,timestamp,action,page,duration_seconds,clicks,is_bot,device_type,location,ip_address,is_fraudulent,risk_score
+USER001,SES12345,2025-10-30 14:00:00,login,/login,5,2,0,Desktop,New York,192.168.1.50,0,0.05
+USER002,SES12346,2025-10-30 14:00:15,browse,/products,45,12,0,Mobile,Los Angeles,192.168.1.51,0,0.12
+USER003,SES12347,2025-10-30 14:00:30,search,/search,15,5,0,Tablet,Chicago,192.168.1.52,0,0.08
+USER004,SES12348,2025-10-30 14:00:45,add_to_cart,/cart,8,3,0,Desktop,Miami,192.168.1.53,0,0.15
+USER005,SES12349,2025-10-30 14:01:00,rapid_clicks,/products,2,156,1,Bot,Unknown,45.76.23.89,1,0.95
+USER006,SES12350,2025-10-30 14:01:15,browse,/about,30,7,0,Mobile,Seattle,192.168.1.54,0,0.06
+USER007,SES12351,2025-10-30 14:01:30,checkout,/checkout,60,15,0,Desktop,Boston,192.168.1.55,0,0.18
+USER008,SES12352,2025-10-30 14:01:45,browse,/blog,120,8,0,Tablet,Houston,192.168.1.56,0,0.09
+USER009,SES12353,2025-10-30 14:02:00,scraping,/api/data,0.5,0,1,Bot,Russia,89.45.67.123,1,0.98
+USER010,SES12354,2025-10-30 14:02:15,browse,/contact,25,4,0,Mobile,Phoenix,192.168.1.57,0,0.07
+USER011,SES12355,2025-10-30 14:02:30,profile_edit,/profile,90,18,0,Desktop,Denver,192.168.1.58,0,0.14
+USER012,SES12356,2025-10-30 14:02:45,browse,/features,35,9,0,Mobile,Las Vegas,192.168.1.59,0,0.11
+USER013,SES12357,2025-10-30 14:03:00,multiple_logins,/login,1,1,0,Desktop,Multiple IPs,various,1,0.87
+USER014,SES12358,2025-10-30 14:03:15,browse,/pricing,40,6,0,Tablet,Atlanta,192.168.1.60,0,0.10
+USER015,SES12359,2025-10-30 14:03:30,add_to_cart,/cart,12,4,0,Desktop,Portland,192.168.1.61,0,0.16
+USER016,SES12360,2025-10-30 14:03:45,browse,/docs,180,20,0,Desktop,San Francisco,192.168.1.62,0,0.13
+USER017,SES12361,2025-10-30 14:04:00,credential_stuffing,/login,0.1,0,1,Bot,China,178.62.48.90,1,0.99
+USER018,SES12362,2025-10-30 14:04:15,browse,/support,55,11,0,Mobile,Dallas,192.168.1.63,0,0.08
+USER019,SES12363,2025-10-30 14:04:30,download,/download,20,2,0,Desktop,Austin,192.168.1.64,0,0.17
+USER020,SES12364,2025-10-30 14:04:45,browse,/gallery,65,14,0,Tablet,Nashville,192.168.1.65,0,0.12
+USER021,SES12365,2025-10-30 14:05:00,account_takeover,/admin,5,3,0,Desktop,Nigeria,156.234.12.45,1,0.92
+USER022,SES12366,2025-10-30 14:05:15,browse,/news,45,8,0,Mobile,Charlotte,192.168.1.66,0,0.09
+USER023,SES12367,2025-10-30 14:05:30,search,/search,18,6,0,Desktop,Indianapolis,192.168.1.67,0,0.11
+USER024,SES12368,2025-10-30 14:05:45,browse,/careers,70,10,0,Tablet,Columbus,192.168.1.68,0,0.07
+USER025,SES12369,2025-10-30 14:06:00,sql_injection,/api/users,0.2,0,1,Bot,Tor Network,various,1,1.00
+USER026,SES12370,2025-10-30 14:06:15,browse,/partners,50,9,0,Mobile,San Diego,192.168.1.69,0,0.10
+USER027,SES12371,2025-10-30 14:06:30,checkout,/checkout,85,16,0,Desktop,Tampa,192.168.1.70,0,0,19
+USER028,SES12372,2025-10-30 14:06:45,browse,/testimonials,40,7,0,Tablet,Kansas City,192.168.1.71,0,0.08
+USER029,SES12373,2025-10-30 14:07:00,mass_registration,/signup,1,200,1,Bot,Ukraine,213.152.45.67,1,0.96
+USER030,SES12374,2025-10-30 14:07:15,browse,/faq,60,12,0,Mobile,Minneapolis,192.168.1.72,0,0.13

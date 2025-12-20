@@ -1,0 +1,12 @@
+PLACEHOLDER: Create a 192x192 PNG icon with:
+- EchoForge logo or 🌌 emoji
+- Gradient background (blue to purple: #4f46e5 to #7c3aed)
+- White text/icon
+
+Use any image editor or online tool like:
+- https://www.favicon-generator.org/
+- https://realfavicongenerator.net/
+- Canva.com
+- Figma
+
+Rename this file to: icon-192.png

@@ -1,0 +1,41 @@
+⚠️ DATABASE SCHEMA UPDATE REQUIRED ⚠️
+
+The application has new features (Pay As You Go) that require database updates.
+
+OPTION 1: Quick Update (Development/Production)
+-----------------------------------------------
+Run this command to update your database:
+
+  npx prisma db push
+
+This will:
+- Add tokenBalanceMicro column to users table
+- Add metadata column to crypto_payments table  
+- Add TOKEN_TRANSACTION to UsageType enum
+- Add PAY_AS_YOU_GO to Plan enum
+
+OPTION 2: Create Migration (Recommended for Production)
+--------------------------------------------------------
+Run these commands:
+
+  npx prisma migrate dev --name add_payg_support
+  npx prisma generate
+
+This will:
+- Create a migration file
+- Apply changes to database
+- Regenerate Prisma Client
+
+OPTION 3: Skip PAYG Features (Temporary)
+-----------------------------------------
+If you don't want Pay As You Go features yet, the app will
+work with graceful fallbacks. PAYG-specific features will
+be disabled but everything else works fine.
+
+Current Status:
+- Sample datasets: ✅ Working (with fallback)
+- Predictions: ✅ Working (demo mode)
+- Analysis: ✅ Working (plan-based)
+- PAYG: ⏸️ Requires migration
+
+Run Option 1 or 2 to enable full PAYG support!

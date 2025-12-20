@@ -1,0 +1,31 @@
+transaction_id,timestamp,amount,merchant,category,card_type,user_id,location,is_anomaly,anomaly_score
+TXN001,2025-10-30 08:15:23,45.99,Amazon,Shopping,Visa,USER123,New York,0,0.12
+TXN002,2025-10-30 08:16:45,1250.00,Best Buy,Electronics,Mastercard,USER456,Los Angeles,1,0.89
+TXN003,2025-10-30 08:18:12,23.50,Starbucks,Food,Amex,USER789,Chicago,0,0.05
+TXN004,2025-10-30 08:19:34,89.99,Nike,Clothing,Visa,USER234,Miami,0,0.18
+TXN005,2025-10-30 08:21:56,4500.00,Unknown Vendor,Other,Visa,USER123,Nigeria,1,0.95
+TXN006,2025-10-30 08:23:18,12.99,Netflix,Subscription,Mastercard,USER567,Seattle,0,0.03
+TXN007,2025-10-30 08:25:40,199.99,Apple Store,Electronics,Amex,USER890,Boston,0,0.22
+TXN008,2025-10-30 08:27:02,75.00,Shell Gas,Fuel,Visa,USER345,Houston,0,0.14
+TXN009,2025-10-30 08:29:24,9999.99,Crypto Exchange,Finance,Visa,USER123,Russia,1,0.98
+TXN010,2025-10-30 08:31:46,34.50,Walmart,Groceries,Mastercard,USER678,Phoenix,0,0.08
+TXN011,2025-10-30 08:34:08,156.78,Target,Shopping,Visa,USER901,Denver,0,0.19
+TXN012,2025-10-30 08:36:30,2300.00,Luxury Hotel,Travel,Amex,USER234,Las Vegas,0,0.45
+TXN013,2025-10-30 08:38:52,18.99,McDonald's,Food,Visa,USER456,Atlanta,0,0.06
+TXN014,2025-10-30 08:41:14,850.00,Suspicious Site,Unknown,Mastercard,USER789,Unknown,1,0.87
+TXN015,2025-10-30 08:43:36,67.45,Home Depot,Hardware,Visa,USER567,Portland,0,0.15
+TXN016,2025-10-30 08:45:58,145.00,Uber,Transportation,Mastercard,USER890,San Francisco,0,0.21
+TXN017,2025-10-30 08:48:20,3200.00,Foreign Merchant,Shopping,Visa,USER123,China,1,0.92
+TXN018,2025-10-30 08:50:42,29.99,Spotify,Subscription,Amex,USER345,Dallas,0,0.04
+TXN019,2025-10-30 08:53:04,499.99,Microsoft,Software,Visa,USER678,Austin,0,0.28
+TXN020,2025-10-30 08:55:26,95.50,Whole Foods,Groceries,Mastercard,USER901,Nashville,0,0.17
+TXN021,2025-10-30 08:57:48,7800.00,Jeweler,Luxury,Amex,USER234,Beverly Hills,1,0.91
+TXN022,2025-10-30 09:00:10,42.00,Chipotle,Food,Visa,USER456,Charlotte,0,0.09
+TXN023,2025-10-30 09:02:32,189.99,PlayStation,Gaming,Mastercard,USER789,Indianapolis,0,0.24
+TXN024,2025-10-30 09:04:54,15.00,Dunkin Donuts,Food,Visa,USER567,Columbus,0,0.02
+TXN025,2025-10-30 09:07:16,5600.00,Dark Web Store,Illegal,Visa,USER123,Tor Network,1,0.99
+TXN026,2025-10-30 09:09:38,78.90,CVS Pharmacy,Health,Mastercard,USER890,San Diego,0,0.16
+TXN027,2025-10-30 09:12:00,234.56,Nordstrom,Clothing,Amex,USER345,Tampa,0,0.26
+TXN028,2025-10-30 09:14:22,52.00,Lyft,Transportation,Visa,USER678,Kansas City,0,0.11
+TXN029,2025-10-30 09:16:44,1890.00,Electronics Store,Shopping,Mastercard,USER901,Minneapolis,0,0.42
+TXN030,2025-10-30 09:19:06,125.00,Gym Membership,Fitness,Visa,USER234,Detroit,0,0.20

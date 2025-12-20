@@ -1,0 +1,18 @@
+# Demo Video Placeholder
+
+To add your demo video:
+1. Record a 30-60 second screen capture of:
+   - Loading a sample dataset
+   - Running anomaly detection
+   - Viewing results with charts
+   - Downloading evidence report
+
+2. Export as MP4 (1080p recommended)
+
+3. Replace this file with: public/demo.mp4
+
+4. The video will auto-play in the hero section
+
+For now, you can use a static screenshot or remove the video section.
+
+

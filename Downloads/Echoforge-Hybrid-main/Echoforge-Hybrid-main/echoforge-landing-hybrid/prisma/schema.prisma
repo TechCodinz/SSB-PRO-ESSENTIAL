@@ -1,0 +1,542 @@
+// Prisma schema for EchoForge - PostgreSQL production ready
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id            String    @id @default(cuid())
+  name          String?
+  email         String    @unique
+  emailVerified DateTime?
+  password      String?
+  image         String?
+  role          UserRole? @default(USER)
+  plan          Plan?     @default(FREE)
+  // status        UserStatus? @default(ACTIVE) // Commented out - not in production database yet
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relations
+  accounts       Account[]
+  sessions       Session[]
+  analyses       Analysis[]
+  payments       Payment[]
+  cryptoPayments CryptoPayment[]
+  usageRecords   UsageRecord[]
+  userLimit      UserLimit?
+  adminAuditLogs AdminAuditLog[]
+  apiKeys        ApiKey[]
+
+  // Buyer licenses
+  licenseKeys LicenseKey[] @relation("BuyerLicenses")
+
+  // Marketplace relations
+  vendorListings MarketplaceListing[] @relation("VendorListings")
+  buyerOrders    MarketplaceOrder[]   @relation("BuyerOrders")
+  vendorProfile  VendorProfile?       @relation("VendorProfileUser")
+  feedback       Feedback[]
+
+  // Profile data
+  company String?
+  phone   String?
+
+  // Usage tracking
+  analysesCount Int @default(0)
+  apiCallsCount Int @default(0)
+
+  // Pay As You Go - Token balance (in micro-tokens for precision)
+  // 1 token = 1,000,000 micro-tokens (6 decimal precision)
+  tokenBalanceMicro BigInt @default(0)
+
+  @@map("users")
+}
+
+model Account {
+  id                String  @id @default(cuid())
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String? @db.Text
+  access_token      String? @db.Text
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String? @db.Text
+  session_state     String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+  @@map("accounts")
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("sessions")
+}
+
+model VerificationToken {
+  identifier String
+  token      String   @unique
+  expires    DateTime
+
+  @@unique([identifier, token])
+  @@map("verification_tokens")
+}
+
+model Analysis {
+  id     String @id @default(cuid())
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  type   AnalysisType
+  status AnalysisStatus @default(PENDING)
+
+  // Input data
+  fileName   String?
+  fileSize   Int?
+  fileUrl    String?
+  dataPoints Int?
+
+  // Results
+  anomaliesFound Int?
+  accuracy       Float?
+  processingTime Int? // milliseconds
+  results        Json?
+
+  createdAt   DateTime  @default(now())
+  completedAt DateTime?
+
+  @@index([userId])
+  @@index([createdAt])
+  @@map("analyses")
+}
+
+model Payment {
+  id     String @id @default(cuid())
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  amount   Int // in cents
+  currency String        @default("usd")
+  status   PaymentStatus @default(PENDING)
+
+  stripePaymentId String? @unique
+  plan            Plan
+
+  createdAt DateTime  @default(now())
+  paidAt    DateTime?
+
+  @@index([userId])
+  @@index([createdAt])
+  @@map("payments")
+}
+
+model CryptoPayment {
+  id     String @id @default(cuid())
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  plan     Plan
+  amount   Int // in USD
+  currency String @default("USDT")
+  network  String // TRC20, ERC20, BEP20
+  metadata Json? // For PAYG token amounts and other data
+
+  walletAddress    String // Your wallet address
+  paymentReference String  @unique
+  txHash           String? // Transaction hash from user
+
+  status CryptoPaymentStatus @default(PENDING)
+
+  createdAt   DateTime  @default(now())
+  expiresAt   DateTime
+  submittedAt DateTime? // When user submits tx hash
+  verifiedAt  DateTime? // When admin verifies
+  verifiedBy  String? // Admin who verified
+
+  @@index([userId])
+  @@index([status])
+  @@index([createdAt])
+  @@map("crypto_payments")
+}
+
+model UsageRecord {
+  id     String @id @default(cuid())
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  type     UsageType
+  count    Int       @default(1)
+  metadata Json?
+
+  createdAt DateTime @default(now())
+
+  @@index([userId, createdAt])
+  @@map("usage_records")
+}
+
+// Per-user override limits managed by admins
+model UserLimit {
+  id               String   @id @default(cuid())
+  userId           String   @unique
+  user             User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  analysisPerDay   Int?
+  rowsPerAnalysis  Int?
+  apiCallsPerMonth Int?
+  updatedAt        DateTime @updatedAt
+  createdAt        DateTime @default(now())
+
+  @@map("user_limits")
+}
+
+// Feature flags (admin-configurable), persisted for consistency across deploys
+model FeatureFlag {
+  id          String   @id @default(cuid())
+  key         String   @unique
+  name        String
+  description String?
+  enabled     Boolean  @default(true)
+  beta        Boolean  @default(false)
+  plans       String   @default("") // comma-separated allowed plans
+  category    String   @default("general")
+  updatedAt   DateTime @updatedAt
+  createdAt   DateTime @default(now())
+
+  @@index([key])
+  @@map("feature_flags")
+}
+
+model SecuritySetting {
+  id                    String   @id
+  twoFactorEnabled      Boolean  @default(true)
+  ipWhitelistingEnabled Boolean  @default(false)
+  sessionTimeout        String   @default("30 minutes")
+  failedLoginLimit      String   @default("5 attempts")
+  updatedAt             DateTime @updatedAt
+  createdAt             DateTime @default(now())
+
+  @@map("security_settings")
+}
+
+model Department {
+  id           String   @id @default(cuid())
+  name         String
+  slug         String   @unique
+  description  String?
+  leadName     String?
+  budgetLabel  String?
+  icon         String   @default("🧩")
+  color        String   @default("from-slate-500/20 via-purple-500/10 to-blue-500/20")
+  membersCount Int      @default(0)
+  performance  Int      @default(80)
+  metrics      Json?
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  teams Team[]
+
+  @@index([slug])
+  @@map("departments")
+}
+
+model Team {
+  id             String      @id @default(cuid())
+  departmentId   String?
+  department     Department? @relation(fields: [departmentId], references: [id], onDelete: SetNull)
+  departmentName String?
+  name           String
+  description    String?
+  leadName       String?
+  membersCount   Int         @default(0)
+  projectsCount  Int         @default(0)
+  performance    Int         @default(80)
+  status         TeamStatus  @default(ACTIVE)
+  icon           String?     @default("👥")
+  color          String?     @default("from-blue-500/20 to-purple-500/20")
+  roster         Json?
+  createdAt      DateTime    @default(now())
+  updatedAt      DateTime    @updatedAt
+
+  @@index([departmentId])
+  @@index([status])
+  @@map("teams")
+}
+
+// Enums
+enum UserRole {
+  READ_ONLY
+  MODERATOR
+  ADMIN
+  OWNER
+  USER
+  EMPLOYEE
+  MANAGER
+}
+
+// Temporarily disabled - column doesn't exist in production database yet
+// enum UserStatus {
+//   ACTIVE
+//   SUSPENDED
+//   PENDING
+// }
+
+enum Plan {
+  FREE
+  STARTER
+  PRO
+  ENTERPRISE
+  PAY_AS_YOU_GO
+}
+
+enum AnalysisType {
+  ANOMALY_DETECTION
+  CRYPTO_FRAUD
+  FORENSICS
+  PREDICTIVE
+}
+
+enum AnalysisStatus {
+  PENDING
+  PROCESSING
+  COMPLETED
+  FAILED
+}
+
+enum PaymentStatus {
+  PENDING
+  SUCCEEDED
+  FAILED
+  REFUNDED
+}
+
+enum UsageType {
+  ANALYSIS
+  API_CALL
+  FILE_UPLOAD
+  REPORT_DOWNLOAD
+  TOKEN_TRANSACTION
+}
+
+enum CryptoPaymentStatus {
+  PENDING
+  PENDING_VERIFICATION
+  CONFIRMED
+  REJECTED
+  EXPIRED
+}
+
+enum TeamStatus {
+  ACTIVE
+  PAUSED
+  ARCHIVED
+}
+
+// Marketplace
+
+model MarketplaceListing {
+  id             String             @id @default(cuid())
+  vendorId       String
+  vendor         User               @relation("VendorListings", fields: [vendorId], references: [id], onDelete: Cascade)
+  title          String
+  description    String
+  category       String
+  priceCents     Int // price in cents
+  currency       String             @default("usd")
+  assetUrl       String?
+  status         ListingStatus      @default(PENDING)
+  purchases      MarketplaceOrder[]
+  downloads      Int                @default(0)
+  rating         Float?
+  purchasesCount Int                @default(0)
+  createdAt      DateTime           @default(now())
+  updatedAt      DateTime           @updatedAt
+
+  // Licenses issued for this listing
+  licenseKeys LicenseKey[] @relation("ListingLicenses")
+
+  @@index([vendorId])
+  @@index([status, createdAt])
+  @@map("marketplace_listings")
+}
+
+model MarketplaceOrder {
+  id          String             @id @default(cuid())
+  listingId   String
+  listing     MarketplaceListing @relation(fields: [listingId], references: [id], onDelete: Cascade)
+  buyerId     String
+  buyer       User               @relation("BuyerOrders", fields: [buyerId], references: [id], onDelete: Cascade)
+  amountCents Int
+  currency    String             @default("usd")
+  status      OrderStatus        @default(PENDING)
+  provider    String // flutterwave, stripe, crypto
+  providerRef String?
+  createdAt   DateTime           @default(now())
+  paidAt      DateTime?
+
+  // Back-reference to license (one-to-one)
+  license LicenseKey? @relation("OrderLicense")
+
+  @@index([buyerId, createdAt])
+  @@index([listingId, createdAt])
+  @@map("marketplace_orders")
+}
+
+model VendorProfile {
+  id          String       @id @default(cuid())
+  userId      String       @unique
+  user        User         @relation("VendorProfileUser", fields: [userId], references: [id], onDelete: Cascade)
+  displayName String
+  bio         String?
+  status      VendorStatus @default(PENDING)
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+
+  @@map("vendor_profiles")
+}
+
+model PlanDefinition {
+  id            String   @id @default(cuid())
+  plan          Plan?    @unique
+  slug          String   @unique
+  name          String
+  priceCents    Int
+  description   String?
+  features      String[] @default([])
+  analysesLimit Int?
+  rowsLimit     Int?
+  apiCallsLimit Int?
+  isActive      Boolean  @default(true)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  @@index([isActive])
+  @@map("plan_definitions")
+}
+
+model AdminAuditLog {
+  id          String    @id @default(cuid())
+  actorId     String?
+  actorEmail  String?
+  actorRole   UserRole?
+  action      String
+  resource    String
+  status      String    @default("SUCCESS")
+  route       String?
+  httpMethod  String?
+  ipAddress   String?
+  userAgent   String?
+  description String?
+  metadata    Json?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  actor User? @relation(fields: [actorId], references: [id], onDelete: SetNull)
+
+  @@index([actorId])
+  @@index([route])
+  @@index([createdAt])
+  @@map("admin_audit_logs")
+}
+
+enum ListingStatus {
+  PENDING
+  APPROVED
+  REJECTED
+}
+
+enum OrderStatus {
+  PENDING
+  SUCCEEDED
+  FAILED
+}
+
+enum VendorStatus {
+  PENDING
+  APPROVED
+  REJECTED
+}
+
+// License keys for marketplace purchases
+model LicenseKey {
+  id      String           @id @default(cuid())
+  // One-to-one with order
+  orderId String           @unique
+  order   MarketplaceOrder @relation("OrderLicense", fields: [orderId], references: [id], onDelete: Cascade)
+
+  // Buyer and listing context
+  buyerId   String
+  buyer     User               @relation("BuyerLicenses", fields: [buyerId], references: [id], onDelete: Cascade)
+  listingId String
+  listing   MarketplaceListing @relation("ListingLicenses", fields: [listingId], references: [id], onDelete: Cascade)
+
+  key       String        @unique
+  status    LicenseStatus @default(ACTIVE)
+  issuedAt  DateTime      @default(now())
+  revokedAt DateTime?
+  expiresAt DateTime?
+
+  @@index([buyerId])
+  @@index([listingId])
+  @@map("license_keys")
+}
+
+enum LicenseStatus {
+  ACTIVE
+  REVOKED
+  EXPIRED
+}
+
+// API Keys for programmatic access
+model ApiKey {
+  id     String @id @default(cuid())
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  name       String
+  key        String    @unique
+  status     String    @default("active") // active, revoked
+  lastUsedAt DateTime?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([userId])
+  @@index([key])
+  @@index([status])
+  @@map("api_keys")
+}
+
+// User Feedback for AI Learning
+model Feedback {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  type      String // "bug", "feature", "issue", "praise", "general"
+  rating    Int? // 1-5 stars (optional)
+  message   String   @db.Text
+  context   Json? // Additional context (page, action, etc.)
+  sentiment Float    @default(0.5) // 0.0 to 1.0 (negative to positive)
+  processed Boolean  @default(false) // Has AI system processed this?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([userId])
+  @@index([type])
+  @@index([processed])
+  @@index([createdAt])
+  @@map("feedback")
+}
